@@ -2,17 +2,21 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>野球くじ 本格版</title>
+<title>リアル野球くじ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     margin: 0;
     font-family: "Arial", sans-serif;
     text-align: center;
-    background: #000;
-    color: #fff;
     overflow: hidden;
+    background: #000;
   }
-  h1 { margin: 10px; }
+  h1 {
+    margin: 10px 0;
+    color: gold;
+    text-shadow: 2px 2px 5px black;
+  }
   button {
     padding: 12px 25px;
     font-size: 1.2em;
@@ -26,71 +30,76 @@
   #field {
     position: relative;
     width: 100vw;
-    height: 65vh;
-    background: url("https://images.unsplash.com/photo-1506466010722-395aa2bef877") center/cover no-repeat;
+    height: 70vh;
+    background: url("https://images.unsplash.com/photo-1556235181-20b9a25f36f2?fit=crop&w=800&h=1200") center/cover no-repeat;
     overflow: hidden;
   }
+  /* ベースとグラウンド */
+  .base { 
+    position: absolute; 
+    width: 40px; 
+    height: 40px; 
+    background: white; 
+    border: 2px solid #ccc; 
+    border-radius: 4px; 
+  }
+  #first { bottom: 15%; left: 80%; }
+  #second { bottom: 50%; left: 50%; transform: translateX(-50%);}
+  #third { bottom: 15%; left: 20%; }
+
   /* バッター */
   #batter {
     position: absolute;
-    bottom: 5%;
+    bottom: 15%;
     left: 55%;
-    width: 80px;
-    height: 160px;
+    width: 60px;
+    height: 150px;
     background: url("https://cdn-icons-png.flaticon.com/512/2889/2889981.png") center/contain no-repeat;
     z-index: 3;
   }
   /* ピッチャー */
   #pitcher {
     position: absolute;
-    bottom: 35%;
+    bottom: 55%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 140px;
+    width: 60px;
+    height: 150px;
     background: url("https://cdn-icons-png.flaticon.com/512/2889/2889991.png") center/contain no-repeat;
+    transform: translateX(-50%);
     z-index: 3;
-  }
-  /* ボール */
-  .ball {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: url("https://cdn-icons-png.flaticon.com/512/3082/3082030.png") center/contain no-repeat;
-    opacity: 0;
-    z-index: 4;
-  }
-  .fly {
-    animation: fly 2.5s forwards;
-  }
-  @keyframes fly {
-    0% { bottom: 10%; left: 55%; opacity: 1; }
-    50% { bottom: 50%; left: 30%; }
-    100% { bottom: 90%; left: 80%; opacity: 0; }
   }
   /* ランナー */
   .runner {
     position: absolute;
-    bottom: 5%;
-    left: 50%;
     width: 50px;
     height: 100px;
     background: url("https://cdn-icons-png.flaticon.com/512/1055/1055646.png") center/contain no-repeat;
     opacity: 0;
-    z-index: 3;
+    z-index: 4;
   }
-  .run {
-    animation: run 3s forwards;
+  /* ボール */
+  .ball {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background: url("https://cdn-icons-png.flaticon.com/512/3082/3082030.png") center/contain no-repeat;
+    opacity: 0;
+    z-index: 5;
   }
-  @keyframes run {
-    0% { left: 50%; bottom: 5%; opacity: 1; }
-    100% { left: 80%; bottom: 40%; opacity: 1; }
+  @keyframes homerunFly {
+    0% { bottom: 15%; left: 55%; opacity: 1; transform: scale(1) rotate(0deg);}
+    50% { bottom: 70%; left: 20%; transform: scale(1.2) rotate(30deg);}
+    100% { bottom: 100%; left: 80%; opacity: 0; transform: scale(0.5) rotate(60deg);}
+  }
+  @keyframes runBase {
+    0% { opacity: 1; left: var(--start); bottom: var(--bottom);}
+    100% { left: var(--end); bottom: var(--endBottom);}
   }
   /* 花火 */
   .firework {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     background: url("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif") center/contain no-repeat;
     opacity: 0;
     animation: boom 2s forwards;
@@ -100,10 +109,9 @@
     50% { opacity: 1; transform: scale(1.3); }
     100% { opacity: 0; transform: scale(0.8); }
   }
-  /* 結果表示 */
   #result {
-    margin-top: 10px;
-    font-size: 2em;
+    margin-top: 5px;
+    font-size: 1.5em;
     font-weight: bold;
     color: gold;
     text-shadow: 2px 2px 5px black;
@@ -111,84 +119,123 @@
 </style>
 </head>
 <body>
-  <h1>⚾ 野球くじ ⚾</h1>
-  <button onclick="draw()">くじを引く！</button>
-  <div id="field">
-    <div id="pitcher"></div>
-    <div id="batter"></div>
-  </div>
-  <div id="result"></div>
+<h1>リアル野球くじ ⚾</h1>
+<button onclick="draw()">くじを引く！</button>
+<div id="field">
+  <div id="pitcher"></div>
+  <div id="batter"></div>
+  <div id="first" class="base"></div>
+  <div id="second" class="base"></div>
+  <div id="third" class="base"></div>
+</div>
+<div id="result"></div>
 
 <script>
-  const prizes = [
-    { text:"特賞A 🎉 場外ホームラン", anim:"homerun" },
-    { text:"特賞B 🎉 満塁ホームラン", anim:"grandSlam" },
-    { text:"1等 🎯 3ベースヒット", anim:"triple" },
-    { text:"2等 😊 2ベースヒット", anim:"double" },
-    { text:"3等 🙌 スクイズ成功", anim:"squeeze" },
-    { text:"4等 😎 セフティバント成功", anim:"bunt" },
-    { text:"5等 🚀 盗塁成功", anim:"steal" },
-    { text:"6等 💥 デッドボール", anim:"deadball" }
-  ];
+const prizes = [
+  {text:"特賞A 🎉 場外ホームラン", anim:"homerun"},
+  {text:"特賞B 🎉 満塁ホームラン", anim:"grandSlam"},
+  {text:"1等 🎯 3ベースヒット", anim:"triple"},
+  {text:"2等 😊 2ベースヒット", anim:"double"},
+  {text:"3等 🙌 スクイズ成功", anim:"squeeze"},
+  {text:"4等 😎 セフティバント成功", anim:"bunt"},
+  {text:"5等 🚀 盗塁成功", anim:"steal"},
+  {text:"6等 💥 デッドボール", anim:"deadball"}
+];
 
-  const field = document.getElementById("field");
-  const resultBox = document.getElementById("result");
+const field = document.getElementById("field");
+const resultBox = document.getElementById("result");
 
-  function clearField(){
-    document.querySelectorAll(".ball,.runner,.firework").forEach(el=>el.remove());
-  }
+function clearField() {
+  document.querySelectorAll(".runner,.ball,.firework").forEach(e=>e.remove());
+}
 
-  function draw(){
-    clearField();
-    const prize = prizes[Math.floor(Math.random()*prizes.length)];
-    resultBox.textContent = prize.text;
+function draw() {
+  clearField();
+  const prize = prizes[Math.floor(Math.random()*prizes.length)];
+  resultBox.textContent = prize.text;
 
-    if(prize.anim==="homerun"){
-      const ball=document.createElement("div");
-      ball.className="ball fly";
-      ball.style.left="55%";
-      ball.style.bottom="10%";
-      field.appendChild(ball);
-      setTimeout(()=>{
-        for(let i=0;i<3;i++){
-          const f=document.createElement("div");
-          f.className="firework";
-          f.style.left=(20+60*Math.random())+"%";
-          f.style.top=(5+20*Math.random())+"%";
-          field.appendChild(f);
-        }
-      },2000);
+  if(prize.anim==="homerun") {
+    const ball=document.createElement("div");
+    ball.className="ball";
+    field.appendChild(ball);
+    ball.style.animation="homerunFly 2.5s forwards";
+
+    for(let i=0;i<4;i++){
+      const runner=document.createElement("div");
+      runner.className="runner";
+      runner.style.setProperty('--start','55%');
+      runner.style.setProperty('--bottom','15%');
+      runner.style.setProperty('--end','80%');
+      runner.style.setProperty('--endBottom','15%');
+      runner.style.animation="runBase 2.5s forwards";
+      runner.style.animationDelay=(i*0.3)+"s";
+      field.appendChild(runner);
     }
-    else if(prize.anim==="grandSlam"){
-      for(let i=0;i<4;i++){
-        const r=document.createElement("div");
-        r.className="runner run";
-        r.style.animationDelay=(i*0.5)+"s";
-        field.appendChild(r);
-      }
-      setTimeout(()=>{
+
+    setTimeout(()=>{
+      for(let i=0;i<3;i++){
         const f=document.createElement("div");
         f.className="firework";
-        f.style.left="50%";
-        f.style.top="10%";
+        f.style.left=(20+60*Math.random())+"%";
+        f.style.top=(5+30*Math.random())+"%";
         field.appendChild(f);
-      },2500);
-    }
-    else if(prize.anim==="triple" || prize.anim==="double" || prize.anim==="steal"){
-      const r=document.createElement("div");
-      r.className="runner run";
-      field.appendChild(r);
-    }
-    else if(prize.anim==="deadball"){
-      const b=document.createElement("div");
-      b.className="ball";
-      b.style.left="55%";
-      b.style.bottom="10%";
-      b.style.opacity=1;
-      b.style.backgroundImage="url('https://cdn-icons-png.flaticon.com/512/799/799205.png')";
-      field.appendChild(b);
-    }
+      }
+    },2000);
   }
+
+  else if(prize.anim==="grandSlam") {
+    for(let i=0;i<4;i++){
+      const runner=document.createElement("div");
+      runner.className="runner";
+      runner.style.setProperty('--start','55%');
+      runner.style.setProperty('--bottom','15%');
+      runner.style.setProperty('--end','80%');
+      runner.style.setProperty('--endBottom','15%');
+      runner.style.animation="runBase 2.5s forwards";
+      runner.style.animationDelay=(i*0.2)+"s";
+      field.appendChild(runner);
+    }
+    setTimeout(()=>{
+      const f=document.createElement("div");
+      f.className="firework";
+      f.style.left="50%";
+      f.style.top="10%";
+      field.appendChild(f);
+    },2200);
+  }
+
+  else if(prize.anim==="triple" || prize.anim==="double" || prize.anim==="steal") {
+    const runner=document.createElement("div");
+    runner.className="runner";
+    runner.style.setProperty('--start','55%');
+    runner.style.setProperty('--bottom','15%');
+    runner.style.setProperty('--end','50%');
+    runner.style.setProperty('--endBottom','50%');
+    runner.style.animation="runBase 2s forwards";
+    field.appendChild(runner);
+  }
+
+  else if(prize.anim==="squeeze" || prize.anim==="bunt") {
+    const runner=document.createElement("div");
+    runner.className="runner";
+    runner.style.setProperty('--start','55%');
+    runner.style.setProperty('--bottom','15%');
+    runner.style.setProperty('--end','50%');
+    runner.style.setProperty('--endBottom','5%');
+    runner.style.animation="runBase 1.5s forwards";
+    field.appendChild(runner);
+  }
+
+  else if(prize.anim==="deadball") {
+    const ball=document.createElement("div");
+    ball.className="ball";
+    ball.style.left="55%";
+    ball.style.bottom="15%";
+    ball.style.opacity=1;
+    ball.style.backgroundImage="url('https://cdn-icons-png.flaticon.com/512/799/799205.png')";
+    field.appendChild(ball);
+  }
+}
 </script>
 </body>
 </html>
