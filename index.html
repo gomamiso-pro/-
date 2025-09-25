@@ -1,241 +1,248 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>リアル野球くじ</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body {
-    margin: 0;
-    font-family: "Arial", sans-serif;
-    text-align: center;
-    overflow: hidden;
-    background: #000;
-  }
-  h1 {
-    margin: 10px 0;
-    color: gold;
-    text-shadow: 2px 2px 5px black;
-  }
-  button {
-    padding: 12px 25px;
-    font-size: 1.2em;
-    border: none;
-    border-radius: 8px;
-    background: #e67e22;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  #field {
-    position: relative;
-    width: 100vw;
-    height: 70vh;
-    background: url("https://images.unsplash.com/photo-1556235181-20b9a25f36f2?fit=crop&w=800&h=1200") center/cover no-repeat;
-    overflow: hidden;
-  }
-  /* ベースとグラウンド */
-  .base { 
-    position: absolute; 
-    width: 40px; 
-    height: 40px; 
-    background: white; 
-    border: 2px solid #ccc; 
-    border-radius: 4px; 
-  }
-  #first { bottom: 15%; left: 80%; }
-  #second { bottom: 50%; left: 50%; transform: translateX(-50%);}
-  #third { bottom: 15%; left: 20%; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Pass</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f3f0;
+            color: #3b2c22;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .page.active {
+            display: flex;
+        }
 
-  /* バッター */
-  #batter {
-    position: absolute;
-    bottom: 15%;
-    left: 55%;
-    width: 60px;
-    height: 150px;
-    background: url("https://cdn-icons-png.flaticon.com/512/2889/2889981.png") center/contain no-repeat;
-    z-index: 3;
-  }
-  /* ピッチャー */
-  #pitcher {
-    position: absolute;
-    bottom: 55%;
-    left: 50%;
-    width: 60px;
-    height: 150px;
-    background: url("https://cdn-icons-png.flaticon.com/512/2889/2889991.png") center/contain no-repeat;
-    transform: translateX(-50%);
-    z-index: 3;
-  }
-  /* ランナー */
-  .runner {
-    position: absolute;
-    width: 50px;
-    height: 100px;
-    background: url("https://cdn-icons-png.flaticon.com/512/1055/1055646.png") center/contain no-repeat;
-    opacity: 0;
-    z-index: 4;
-  }
-  /* ボール */
-  .ball {
-    position: absolute;
-    width: 35px;
-    height: 35px;
-    background: url("https://cdn-icons-png.flaticon.com/512/3082/3082030.png") center/contain no-repeat;
-    opacity: 0;
-    z-index: 5;
-  }
-  @keyframes homerunFly {
-    0% { bottom: 15%; left: 55%; opacity: 1; transform: scale(1) rotate(0deg);}
-    50% { bottom: 70%; left: 20%; transform: scale(1.2) rotate(30deg);}
-    100% { bottom: 100%; left: 80%; opacity: 0; transform: scale(0.5) rotate(60deg);}
-  }
-  @keyframes runBase {
-    0% { opacity: 1; left: var(--start); bottom: var(--bottom);}
-    100% { left: var(--end); bottom: var(--endBottom);}
-  }
-  /* 花火 */
-  .firework {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: url("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif") center/contain no-repeat;
-    opacity: 0;
-    animation: boom 2s forwards;
-  }
-  @keyframes boom {
-    0% { opacity: 1; transform: scale(0.5); }
-    50% { opacity: 1; transform: scale(1.3); }
-    100% { opacity: 0; transform: scale(0.8); }
-  }
-  #result {
-    margin-top: 5px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: gold;
-    text-shadow: 2px 2px 5px black;
-  }
-</style>
+        /* ヘッダー */
+        header {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5a463b;
+        }
+
+        /* ホーム画面 */
+        #home-page .ticket-balance {
+            background-color: #e0d8d2;
+            padding: 40px 20px;
+            border-radius: 15px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #home-page .ticket-balance h2 {
+            margin: 0;
+            font-size: 1rem;
+            color: #8c786a;
+        }
+        #home-page .ticket-balance .count {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #5a463b;
+            margin: 10px 0 0;
+        }
+        #home-page button {
+            background-color: #5a463b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #home-page button:hover {
+            background-color: #3b2c22;
+        }
+
+        /* QRコード画面 */
+        #qr-page .qr-code-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        #qr-page img {
+            width: 200px;
+            height: 200px;
+        }
+        #qr-page p {
+            text-align: center;
+            color: #8c786a;
+            font-size: 0.9rem;
+        }
+
+        /* 履歴画面 */
+        #history-page ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        #history-page li {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #history-page .date {
+            font-weight: bold;
+            color: #5a463b;
+        }
+        #history-page .details {
+            display: flex;
+            align-items: center;
+        }
+        #history-page .details .count {
+            color: #d9534f;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        #history-page .details .store {
+            color: #8c786a;
+        }
+
+        /* ナビゲーション */
+        .navigation {
+            width: 100%;
+            max-width: 400px;
+            position: fixed;
+            bottom: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navigation button {
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            color: #8c786a;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .navigation button.active {
+            color: #5a463b;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<h1>リアル野球くじ ⚾</h1>
-<button onclick="draw()">くじを引く！</button>
-<div id="field">
-  <div id="pitcher"></div>
-  <div id="batter"></div>
-  <div id="first" class="base"></div>
-  <div id="second" class="base"></div>
-  <div id="third" class="base"></div>
-</div>
-<div id="result"></div>
 
-<script>
-const prizes = [
-  {text:"特賞A 🎉 場外ホームラン", anim:"homerun"},
-  {text:"特賞B 🎉 満塁ホームラン", anim:"grandSlam"},
-  {text:"1等 🎯 3ベースヒット", anim:"triple"},
-  {text:"2等 😊 2ベースヒット", anim:"double"},
-  {text:"3等 🙌 スクイズ成功", anim:"squeeze"},
-  {text:"4等 😎 セフティバント成功", anim:"bunt"},
-  {text:"5等 🚀 盗塁成功", anim:"steal"},
-  {text:"6等 💥 デッドボール", anim:"deadball"}
-];
+    <div class="container">
+        <header>Coffee Pass</header>
 
-const field = document.getElementById("field");
-const resultBox = document.getElementById("result");
+        <div id="home-page" class="page active">
+            <div class="ticket-balance">
+                <h2>残りチケット</h2>
+                <div class="count">7</div>
+            </div>
+            <button onclick="showPage('qr-page')">QRコードを表示</button>
+            <div style="margin-top: 30px;">
+                <p>最近の利用</p>
+                <ul>
+                    <li>
+                        <span class="date">2024.03.10</span>
+                        <div class="details">
+                            <span class="store">Cafe Mocha</span>
+                            <span class="count">-1枚</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-function clearField() {
-  document.querySelectorAll(".runner,.ball,.firework").forEach(e=>e.remove());
-}
+        <div id="qr-page" class="page">
+            <h2>ご利用のQRコード</h2>
+            <div class="qr-code-container">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=COFFEE_TICKET_12345" alt="QR Code">
+            </div>
+            <p>※ご使用の際は、お店のスタッフにお見せください。</p>
+        </div>
 
-function draw() {
-  clearField();
-  const prize = prizes[Math.floor(Math.random()*prizes.length)];
-  resultBox.textContent = prize.text;
+        <div id="history-page" class="page">
+            <h2>利用履歴</h2>
+            <ul>
+                <li>
+                    <span class="date">2024.03.10</span>
+                    <div class="details">
+                        <span class="store">Cafe Mocha</span>
+                        <span class="count">-1枚</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="date">2024.03.05</span>
+                    <div class="details">
+                        <span class="store">Cafe Mocha</span>
+                        <span class="count">-1枚</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="date">2024.02.05</span>
+                    <div class="details">
+                        <span class="store">Cafe Mocha</span>
+                        <span class="count">-1枚</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-  if(prize.anim==="homerun") {
-    const ball=document.createElement("div");
-    ball.className="ball";
-    field.appendChild(ball);
-    ball.style.animation="homerunFly 2.5s forwards";
+    <nav class="navigation">
+        <button id="home-nav" class="active" onclick="showPage('home-page', 'home-nav')">ホーム</button>
+        <button id="history-nav" onclick="showPage('history-page', 'history-nav')">履歴</button>
+    </nav>
 
-    for(let i=0;i<4;i++){
-      const runner=document.createElement("div");
-      runner.className="runner";
-      runner.style.setProperty('--start','55%');
-      runner.style.setProperty('--bottom','15%');
-      runner.style.setProperty('--end','80%');
-      runner.style.setProperty('--endBottom','15%');
-      runner.style.animation="runBase 2.5s forwards";
-      runner.style.animationDelay=(i*0.3)+"s";
-      field.appendChild(runner);
-    }
+    <script>
+        function showPage(pageId, navId) {
+            // すべてのページを非表示にする
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            // 指定されたページを表示する
+            document.getElementById(pageId).classList.add('active');
 
-    setTimeout(()=>{
-      for(let i=0;i<3;i++){
-        const f=document.createElement("div");
-        f.className="firework";
-        f.style.left=(20+60*Math.random())+"%";
-        f.style.top=(5+30*Math.random())+"%";
-        field.appendChild(f);
-      }
-    },2000);
-  }
-
-  else if(prize.anim==="grandSlam") {
-    for(let i=0;i<4;i++){
-      const runner=document.createElement("div");
-      runner.className="runner";
-      runner.style.setProperty('--start','55%');
-      runner.style.setProperty('--bottom','15%');
-      runner.style.setProperty('--end','80%');
-      runner.style.setProperty('--endBottom','15%');
-      runner.style.animation="runBase 2.5s forwards";
-      runner.style.animationDelay=(i*0.2)+"s";
-      field.appendChild(runner);
-    }
-    setTimeout(()=>{
-      const f=document.createElement("div");
-      f.className="firework";
-      f.style.left="50%";
-      f.style.top="10%";
-      field.appendChild(f);
-    },2200);
-  }
-
-  else if(prize.anim==="triple" || prize.anim==="double" || prize.anim==="steal") {
-    const runner=document.createElement("div");
-    runner.className="runner";
-    runner.style.setProperty('--start','55%');
-    runner.style.setProperty('--bottom','15%');
-    runner.style.setProperty('--end','50%');
-    runner.style.setProperty('--endBottom','50%');
-    runner.style.animation="runBase 2s forwards";
-    field.appendChild(runner);
-  }
-
-  else if(prize.anim==="squeeze" || prize.anim==="bunt") {
-    const runner=document.createElement("div");
-    runner.className="runner";
-    runner.style.setProperty('--start','55%');
-    runner.style.setProperty('--bottom','15%');
-    runner.style.setProperty('--end','50%');
-    runner.style.setProperty('--endBottom','5%');
-    runner.style.animation="runBase 1.5s forwards";
-    field.appendChild(runner);
-  }
-
-  else if(prize.anim==="deadball") {
-    const ball=document.createElement("div");
-    ball.className="ball";
-    ball.style.left="55%";
-    ball.style.bottom="15%";
-    ball.style.opacity=1;
-    ball.style.backgroundImage="url('https://cdn-icons-png.flaticon.com/512/799/799205.png')";
-    field.appendChild(ball);
-  }
-}
-</script>
+            // すべてのナビゲーションボタンから active クラスを削除する
+            const navButtons = document.querySelectorAll('.navigation button');
+            navButtons.forEach(button => button.classList.remove('active'));
+            // クリックされたボタンに active クラスを追加する
+            if (navId) {
+                document.getElementById(navId).classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
