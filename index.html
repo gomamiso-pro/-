@@ -2,100 +2,167 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ピンポン玉くじ</title>
+<title>ユーホーキャッチャーくじ</title>
 <style>
   body {
     font-family: "Arial", sans-serif;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 20px;
     background: #f1f2f6;
-    margin: 0;
-    padding: 0;
   }
-  h1 { margin: 20px 0; }
-  #box {
-    width: 320px;
-    height: 220px;
-    margin: 40px auto;
+  #game {
+    width: 300px;
+    height: 400px;
     border: 4px solid #2f3542;
-    border-radius: 20px;
+    border-radius: 10px;
     background: #dfe4ea;
     position: relative;
     overflow: hidden;
   }
-  .ball {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #fff, #ff4757);
+  .capsule {
+    width: 50px;
+    height: 70px;
+    border-radius: 50% 50% 40% 40%;
+    background: linear-gradient(to bottom, #ff6b81, #ff4757);
     position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: bounce 2s ease-in-out forwards;
-  }
-  .highlight {
-    background: radial-gradient(circle at 30% 30%, #fff, #2ed573);
-    animation: bounce 2s ease-in-out forwards, blink 1s infinite;
-  }
-  @keyframes bounce {
-    0% { top: -50px; }
-    50% { top: 160px; }
-    70% { top: 100px; }
-    90% { top: 160px; }
-    100% { top: 160px; }
-  }
-  @keyframes blink {
-    0%, 50%, 100% { box-shadow: 0 0 10px 5px yellow; }
-    25%, 75% { box-shadow: none; }
-  }
-  #prize {
-    font-size: 1.4em;
+    bottom: 20px;
+    text-align: center;
+    line-height: 70px;
     font-weight: bold;
-    margin-top: 20px;
-    color: #2f3542;
+    color: white;
+  }
+  #claw {
+    width: 50px;
+    height: 20px;
+    background: #57606f;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: left 0.3s;
+  }
+  #controls {
+    margin-top: 15px;
+    text-align: center;
+  }
+  button {
+    margin: 5px;
+    padding: 8px 15px;
+    font-size: 1em;
+  }
+  #result {
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  #prizeList {
+    min-width: 250px;
+  }
+  #prizeList h2 {
+    margin-bottom: 10px;
+  }
+  .prize {
+    padding: 5px;
+    margin: 5px 0;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+  }
+  .done {
+    color: red;
+    font-weight: bold;
   }
 </style>
 </head>
 <body>
-  <h1>🏓 ピンポン玉くじ 🎯</h1>
-  <div id="box"></div>
-  <div id="prize"></div>
 
-  <script>
-    const prizes = [
-      "特賞A 🎉 スペシャリティコーヒー100g",
-      "特賞B 🎉 スペシャリティコーヒー100g",
-      "1等 🎯 ドリップパック2個と豆",
-      "2等 😊 ドリップパック1個と豆",
-      "3等 🍛 カレー",
-      "4等 🍪 お菓子",
-      "5等 😱 なんにもない"
-    ];
+  <div>
+    <div id="game">
+      <div id="claw"></div>
+    </div>
+    <div id="controls">
+      <button onclick="moveLeft()">←</button>
+      <button onclick="moveRight()">→</button>
+      <button onclick="grab()">つかむ！</button>
+    </div>
+    <div id="result"></div>
+  </div>
 
-    const box = document.getElementById("box");
-    const prizeBox = document.getElementById("prize");
+  <div id="prizeList">
+    <h2>賞品リスト</h2>
+    <div class="prize" data-prize="特賞A 🎉 スペシャリティコーヒー100g">特賞A コーヒー100g <span></span></div>
+    <div class="prize" data-prize="特賞B 🎉 スペシャリティコーヒー100g">特賞B コーヒー100g <span></span></div>
+    <div class="prize" data-prize="1等 🎯 ドリップパック2個と豆">1等 ドリップパック2個と豆 <span></span></div>
+    <div class="prize" data-prize="2等 😊 ドリップパック1個と豆">2等 ドリップパック1個と豆 <span></span></div>
+    <div class="prize" data-prize="3等 🍛 カレー">3等 カレー <span></span></div>
+    <div class="prize" data-prize="4等 🍪 お菓子">4等 お菓子 <span></span></div>
+    <div class="prize" data-prize="5等 😱 なんにもない">5等 なんにもない <span></span></div>
+  </div>
 
-    // 当たり賞品を決定
-    const prize = prizes[Math.floor(Math.random() * prizes.length)];
-    prizeBox.textContent = "当たり賞品：" + prize;
+<script>
+  const game = document.getElementById("game");
+  const claw = document.getElementById("claw");
+  const result = document.getElementById("result");
+  const capsules = [];
+  const prizes = [
+    "特賞A 🎉 スペシャリティコーヒー100g",
+    "特賞B 🎉 スペシャリティコーヒー100g",
+    "1等 🎯 ドリップパック2個と豆",
+    "2等 😊 ドリップパック1個と豆",
+    "3等 🍛 カレー",
+    "4等 🍪 お菓子",
+    "5等 😱 なんにもない"
+  ];
 
-    // 7つの玉を生成
-    for (let i = 0; i < 7; i++) {
-      const ball = document.createElement("div");
-      ball.classList.add("ball");
+  // カプセル配置
+  prizes.forEach((p, i) => {
+    const c = document.createElement("div");
+    c.className = "capsule";
+    c.style.left = (30 + i * 35) + "px";
+    c.dataset.prize = p;
+    c.textContent = i+1;
+    game.appendChild(c);
+    capsules.push(c);
+  });
 
-      // 位置をランダムにずらす
-      const left = 20 + i * 40 + Math.random() * 20;
-      ball.style.left = left + "px";
-      ball.style.animationDelay = (i * 0.3) + "s";
+  let clawPos = 0;
 
-      // 1個だけ当たり玉にする
-      if (i === Math.floor(Math.random() * 7)) {
-        ball.classList.add("highlight");
-      }
-
-      box.appendChild(ball);
+  function moveLeft() {
+    if (clawPos > 0) {
+      clawPos--;
+      claw.style.left = (30 + clawPos * 35) + "px";
     }
-  </script>
+  }
+
+  function moveRight() {
+    if (clawPos < capsules.length - 1) {
+      clawPos++;
+      claw.style.left = (30 + clawPos * 35) + "px";
+    }
+  }
+
+  function grab() {
+    const capsule = capsules[clawPos];
+    if (!capsule) return;
+
+    const prize = capsule.dataset.prize;
+    result.textContent = "🎊 あたったのは… " + prize;
+
+    // リストに「済」マーク
+    document.querySelectorAll("#prizeList .prize").forEach(p => {
+      if (p.dataset.prize === prize) {
+        p.querySelector("span").textContent = "済";
+        p.querySelector("span").classList.add("done");
+      }
+    });
+
+    // 次の人のためにカプセルを消す
+    capsule.remove();
+    capsules[clawPos] = null;
+  }
+</script>
+
 </body>
 </html>
