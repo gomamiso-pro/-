@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>スマホひっくり返しくじ引き</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    #ball {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #ff7675);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2em;
+      color: #333;
+      font-weight: bold;
+      position: absolute;
+      top: -150px;
+      opacity: 0;
+      transition: top 1s ease, opacity 0.5s;
+    }
+    #ball.show {
+      top: 200px;
+      opacity: 1;
+    }
+    #prize {
+      margin-top: 250px;
+      font-size: 1.5em;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    #prize.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 スマホをひっくり返して くじを引こう！</h1>
+  <div id="ball"></div>
+  <div id="prize"></div>
+
+  <script>
+    const prizes = [
+      "特賞A 🎉 スペシャリティコーヒー100g",
+      "特賞B 🎉 スペシャリティコーヒー100g",
+      "1等 🎯 ドリップパック2個と豆",
+      "2等 😊 ドリップパック1個と豆",
+      "3等 🍛 カレー",
+      "4等 🍪 お菓子",
+      "5等 😱 なんにもない"
+    ];
+
+    let alreadyDrawn = false;
+
+    function drawLottery() {
+      if (alreadyDrawn) return; // 1回だけ
+      alreadyDrawn = true;
+
+      const ball = document.getElementById("ball");
+      const prizeBox = document.getElementById("prize");
+
+      // 玉が出てくる
+      ball.textContent = "🎱";
+      ball.classList.add("show");
+
+      setTimeout(() => {
+        // 賞品決定
+        const prize = prizes[Math.floor(Math.random() * prizes.length)];
+        ball.textContent = "🎊";
+        prizeBox.textContent = prize;
+        prizeBox.classList.add("show");
+      }, 1500);
+    }
+
+    // スマホの傾きを検出
+    window.addEventListener("deviceorientation", (event) => {
+      // βは前後の傾き（上下ひっくり返すと ±180 近くなる）
+      if (event.beta < -150 || event.beta > 150) {
+        drawLottery();
+      }
+    });
+  </script>
+</body>
+</html>
