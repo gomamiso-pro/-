@@ -7,15 +7,19 @@
   body {
     font-family: "Arial", sans-serif;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 30px;
-    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
     background: #f1f2f6;
   }
+  h1 {
+    margin: 10px 0;
+    font-size: 5vw;
+  }
   #game {
-    width: 300px;
-    height: 400px;
+    width: 90vw;
+    max-width: 500px;
+    aspect-ratio: 3 / 4;
     border: 4px solid #2f3542;
     border-radius: 10px;
     background: #dfe4ea;
@@ -23,20 +27,25 @@
     overflow: hidden;
   }
   .capsule {
-    width: 50px;
-    height: 70px;
+    width: 12vw;
+    max-width: 60px;
+    aspect-ratio: 5 / 7;
     border-radius: 50% 50% 40% 40%;
-    background: linear-gradient(to bottom, #ff6b81, #ff4757);
+    background: linear-gradient(to bottom, #70a1ff, #3742fa);
     position: absolute;
-    bottom: 20px;
-    text-align: center;
-    line-height: 70px;
+    bottom: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-weight: bold;
     color: white;
+    font-size: 4vw;
   }
   #claw {
-    width: 50px;
-    height: 20px;
+    width: 14vw;
+    max-width: 70px;
+    height: 6vw;
+    max-height: 30px;
     background: #57606f;
     position: absolute;
     top: 0;
@@ -44,24 +53,31 @@
     transition: left 0.3s;
   }
   #controls {
-    margin-top: 15px;
+    margin-top: 10px;
     text-align: center;
   }
   button {
     margin: 5px;
     padding: 8px 15px;
-    font-size: 1em;
+    font-size: 4vw;
+    border-radius: 6px;
+    border: none;
+    background: #ff6b81;
+    color: white;
   }
   #result {
-    margin-top: 15px;
-    font-size: 1.2em;
+    margin-top: 10px;
+    font-size: 4vw;
     font-weight: bold;
   }
   #prizeList {
-    min-width: 250px;
+    margin-top: 20px;
+    width: 90vw;
+    max-width: 500px;
   }
   #prizeList h2 {
     margin-bottom: 10px;
+    font-size: 5vw;
   }
   .prize {
     padding: 5px;
@@ -69,6 +85,7 @@
     border-bottom: 1px solid #ccc;
     display: flex;
     justify-content: space-between;
+    font-size: 4vw;
   }
   .done {
     color: red;
@@ -78,17 +95,16 @@
 </head>
 <body>
 
-  <div>
-    <div id="game">
-      <div id="claw"></div>
-    </div>
-    <div id="controls">
-      <button onclick="moveLeft()">←</button>
-      <button onclick="moveRight()">→</button>
-      <button onclick="grab()">つかむ！</button>
-    </div>
-    <div id="result"></div>
+  <h1>🎮 ユーホーキャッチャーくじ</h1>
+  <div id="game">
+    <div id="claw"></div>
   </div>
+  <div id="controls">
+    <button onclick="moveLeft()">←</button>
+    <button onclick="moveRight()">→</button>
+    <button onclick="grab()">つかむ！</button>
+  </div>
+  <div id="result"></div>
 
   <div id="prizeList">
     <h2>賞品リスト</h2>
@@ -116,13 +132,15 @@
     "5等 😱 なんにもない"
   ];
 
-  // カプセル配置
-  prizes.forEach((p, i) => {
+  // シャッフルして賞品をカプセルに割り当て
+  const shuffledPrizes = prizes.sort(() => Math.random() - 0.5);
+
+  shuffledPrizes.forEach((p, i) => {
     const c = document.createElement("div");
     c.className = "capsule";
-    c.style.left = (30 + i * 35) + "px";
+    c.style.left = (10 + i * 13) + "%";
     c.dataset.prize = p;
-    c.textContent = i+1;
+    c.textContent = i + 1; // 番号だけ表示
     game.appendChild(c);
     capsules.push(c);
   });
@@ -132,14 +150,14 @@
   function moveLeft() {
     if (clawPos > 0) {
       clawPos--;
-      claw.style.left = (30 + clawPos * 35) + "px";
+      claw.style.left = (10 + clawPos * 13) + "%";
     }
   }
 
   function moveRight() {
     if (clawPos < capsules.length - 1) {
       clawPos++;
-      claw.style.left = (30 + clawPos * 35) + "px";
+      claw.style.left = (10 + clawPos * 13) + "%";
     }
   }
 
@@ -148,7 +166,7 @@
     if (!capsule) return;
 
     const prize = capsule.dataset.prize;
-    result.textContent = "🎊 あたったのは… " + prize;
+    result.textContent = "🎊 カプセルの中身は… " + prize;
 
     // リストに「済」マーク
     document.querySelectorAll("#prizeList .prize").forEach(p => {
@@ -158,7 +176,7 @@
       }
     });
 
-    // 次の人のためにカプセルを消す
+    // カプセルを取り除く（次の人のために空にする）
     capsule.remove();
     capsules[clawPos] = null;
   }
