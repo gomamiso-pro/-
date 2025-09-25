@@ -27,6 +27,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            padding-bottom: 70px; /* ナビゲーションバーの分を確保 */
         }
         .page.active {
             display: flex;
@@ -43,6 +44,14 @@
             color: #5a463b;
         }
 
+        /* 共通スタイル */
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #5a463b;
+        }
+
         /* ホーム画面 */
         #home-page .ticket-balance {
             background-color: #e0d8d2;
@@ -53,7 +62,7 @@
             margin-bottom: 30px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        #home-page .ticket-balance h2 {
+        #home-page .ticket-balance h3 {
             margin: 0;
             font-size: 1rem;
             color: #8c786a;
@@ -64,7 +73,7 @@
             color: #5a463b;
             margin: 10px 0 0;
         }
-        #home-page button {
+        #home-page .qr-button {
             background-color: #5a463b;
             color: white;
             border: none;
@@ -75,9 +84,48 @@
             cursor: pointer;
             transition: background-color 0.3s;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            width: 80%;
         }
-        #home-page button:hover {
+        #home-page .qr-button:hover {
             background-color: #3b2c22;
+        }
+        #home-page .recent-history {
+            width: 100%;
+            margin-top: 30px;
+        }
+        #home-page .recent-history h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        #home-page .history-list {
+            list-style: none;
+            padding: 0;
+        }
+        #home-page .history-list li {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #home-page .history-list .date {
+            font-weight: bold;
+            color: #5a463b;
+        }
+        #home-page .history-list .details {
+            text-align: right;
+        }
+        #home-page .history-list .store {
+            color: #8c786a;
+            font-size: 0.9rem;
+        }
+        #home-page .history-list .count {
+            color: #d9534f;
+            font-weight: bold;
+            font-size: 1rem;
         }
 
         /* QRコード画面 */
@@ -92,10 +140,23 @@
             width: 200px;
             height: 200px;
         }
-        #qr-page p {
+        #qr-page .ticket-info {
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        #qr-page .ticket-info p {
+            margin: 5px 0;
+            color: #5a463b;
+        }
+        #qr-page .ticket-info span {
+            font-weight: bold;
+        }
+        #qr-page .caution {
             text-align: center;
             color: #8c786a;
             font-size: 0.9rem;
+            margin-top: 20px;
         }
 
         /* 履歴画面 */
@@ -114,21 +175,31 @@
             justify-content: space-between;
             align-items: center;
         }
-        #history-page .date {
+        #history-page .history-date {
             font-weight: bold;
             color: #5a463b;
+            font-size: 1rem;
         }
-        #history-page .details {
-            display: flex;
-            align-items: center;
+        #history-page .history-details {
+            text-align: right;
         }
-        #history-page .details .count {
+        #history-page .history-details .store-name {
+            color: #8c786a;
+            font-size: 0.9rem;
+        }
+        #history-page .history-details .used-count {
             color: #d9534f;
             font-weight: bold;
-            margin-left: 15px;
+            font-size: 1rem;
         }
-        #history-page .details .store {
-            color: #8c786a;
+        #history-page .ticket-type {
+            font-size: 0.8rem;
+            background-color: #5a463b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
         }
 
         /* ナビゲーション */
@@ -154,10 +225,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            font-weight: bold;
         }
         .navigation button.active {
             color: #5a463b;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -168,21 +239,22 @@
 
         <div id="home-page" class="page active">
             <div class="ticket-balance">
-                <h2>残りチケット</h2>
+                <h3>残りチケット</h3>
                 <div class="count">7</div>
             </div>
-            <button onclick="showPage('qr-page')">QRコードを表示</button>
-            <div style="margin-top: 30px;">
-                <p>最近の利用</p>
-                <ul>
+            <button class="qr-button" onclick="showPage('qr-page', 'qr-nav')">QRコードを表示</button>
+            <div class="recent-history">
+                <h3>最近の利用履歴</h3>
+                <ul class="history-list">
                     <li>
                         <span class="date">2024.03.10</span>
                         <div class="details">
-                            <span class="store">Cafe Mocha</span>
+                            <span class="store">Cafe Mocha</span><br>
                             <span class="count">-1枚</span>
                         </div>
                     </li>
                 </ul>
+                <p style="text-align: center; margin-top: 10px;"><a href="#" onclick="showPage('history-page', 'history-nav')">履歴をすべて見る</a></p>
             </div>
         </div>
 
@@ -191,31 +263,41 @@
             <div class="qr-code-container">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=COFFEE_TICKET_12345" alt="QR Code">
             </div>
-            <p>※ご使用の際は、お店のスタッフにお見せください。</p>
+            <div class="ticket-info">
+                <p>チケット種別：<span>ドリンクチケット</span></p>
+                <p>利用枚数：<span>1枚</span></p>
+            </div>
+            <p class="caution">※ご利用の際は、お店のスタッフにお見せください。</p>
         </div>
 
         <div id="history-page" class="page">
             <h2>利用履歴</h2>
             <ul>
                 <li>
-                    <span class="date">2024.03.10</span>
-                    <div class="details">
-                        <span class="store">Cafe Mocha</span>
-                        <span class="count">-1枚</span>
+                    <span class="history-date">2024.03.10</span>
+                    <div class="history-details">
+                        <span class="store-name">Cafe Mocha</span>
+                        <span class="ticket-type">デジタル</span>
+                        <br>
+                        <span class="used-count">-1枚</span>
                     </div>
                 </li>
                 <li>
-                    <span class="date">2024.03.05</span>
-                    <div class="details">
-                        <span class="store">Cafe Mocha</span>
-                        <span class="count">-1枚</span>
+                    <span class="history-date">2024.03.05</span>
+                    <div class="history-details">
+                        <span class="store-name">Cafe Mocha</span>
+                        <span class="ticket-type">紙</span>
+                        <br>
+                        <span class="used-count">-1枚</span>
                     </div>
                 </li>
                 <li>
-                    <span class="date">2024.02.05</span>
-                    <div class="details">
-                        <span class="store">Cafe Mocha</span>
-                        <span class="count">-1枚</span>
+                    <span class="history-date">2024.02.05</span>
+                    <div class="history-details">
+                        <span class="store-name">Cafe Latte</span>
+                        <span class="ticket-type">デジタル</span>
+                        <br>
+                        <span class="used-count">-1枚</span>
                     </div>
                 </li>
             </ul>
@@ -229,16 +311,12 @@
 
     <script>
         function showPage(pageId, navId) {
-            // すべてのページを非表示にする
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
-            // 指定されたページを表示する
             document.getElementById(pageId).classList.add('active');
 
-            // すべてのナビゲーションボタンから active クラスを削除する
             const navButtons = document.querySelectorAll('.navigation button');
             navButtons.forEach(button => button.classList.remove('active'));
-            // クリックされたボタンに active クラスを追加する
             if (navId) {
                 document.getElementById(navId).classList.add('active');
             }
