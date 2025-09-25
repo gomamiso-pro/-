@@ -2,185 +2,251 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユーホーキャッチャーくじ</title>
+<title>野球くじ</title>
 <style>
   body {
-    font-family: "Arial", sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     margin: 0;
-    background: #f1f2f6;
-  }
-  h1 {
-    margin: 10px 0;
-    font-size: 5vw;
-  }
-  #game {
-    width: 90vw;
-    max-width: 500px;
-    aspect-ratio: 3 / 4;
-    border: 4px solid #2f3542;
-    border-radius: 10px;
-    background: #dfe4ea;
-    position: relative;
+    font-family: "Arial", sans-serif;
+    text-align: center;
+    background: #2d3436;
+    color: #fff;
     overflow: hidden;
   }
-  .capsule {
-    width: 12vw;
-    max-width: 60px;
-    aspect-ratio: 5 / 7;
-    border-radius: 50% 50% 40% 40%;
-    background: linear-gradient(to bottom, #70a1ff, #3742fa);
-    position: absolute;
-    bottom: 5%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
+  h1 { margin: 10px; }
+  button {
+    padding: 12px 25px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    background: #00cec9;
     color: white;
-    font-size: 4vw;
+    cursor: pointer;
+    margin-bottom: 10px;
   }
-  #claw {
-    width: 14vw;
-    max-width: 70px;
-    height: 6vw;
-    max-height: 30px;
-    background: #57606f;
+  #field {
+    position: relative;
+    width: 100vw;
+    height: 65vh;
+    background: linear-gradient(to top, #27ae60 60%, #74b9ff 100%);
+    overflow: hidden;
+    border-top: 8px solid #636e72;
+  }
+  /* スタンド（観客席） */
+  #stands {
     position: absolute;
     top: 0;
     left: 0;
-    transition: left 0.3s;
+    width: 100%;
+    height: 20%;
+    background: repeating-linear-gradient(
+      45deg,
+      #dfe6e9,
+      #dfe6e9 10px,
+      #b2bec3 10px,
+      #b2bec3 20px
+    );
+    z-index: 1;
   }
-  #controls {
-    margin-top: 10px;
-    text-align: center;
+  /* ピッチャーマウンドとバッターボックス */
+  #diamond {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: #ffeaa7;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    border: 2px solid #d35400;
+    z-index: 2;
   }
-  button {
-    margin: 5px;
-    padding: 8px 15px;
-    font-size: 4vw;
-    border-radius: 6px;
-    border: none;
-    background: #ff6b81;
-    color: white;
+  /* バッター */
+  #batter {
+    position: absolute;
+    bottom: 15%;
+    left: 55%;
+    font-size: 3em;
+    z-index: 3;
+  }
+  /* ピッチャー */
+  #pitcher {
+    position: absolute;
+    bottom: 45%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3em;
+    z-index: 3;
+  }
+  /* ボール */
+  .ball {
+    position: absolute;
+    font-size: 2.5em;
+    opacity: 0;
+    z-index: 4;
+  }
+  .fly {
+    animation: fly 2.5s forwards;
+  }
+  @keyframes fly {
+    0% { bottom: 20%; left: 55%; opacity: 1; }
+    50% { bottom: 60%; left: 30%; }
+    100% { bottom: 100%; left: 80%; opacity: 0; }
+  }
+  /* ランナー */
+  .runner {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    font-size: 2em;
+    opacity: 0;
+    z-index: 3;
+  }
+  .run {
+    animation: run 3s forwards;
+  }
+  @keyframes run {
+    0% { left: 50%; bottom: 15%; opacity: 1; }
+    100% { left: 80%; bottom: 50%; opacity: 1; }
+  }
+  /* 花火 */
+  .firework {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    font-size: 2em;
+    opacity: 0;
+    animation: boom 2s forwards;
+  }
+  @keyframes boom {
+    0% { transform: scale(0.2); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0; }
   }
   #result {
-    margin-top: 10px;
-    font-size: 4vw;
-    font-weight: bold;
-  }
-  #prizeList {
-    margin-top: 20px;
-    width: 90vw;
-    max-width: 500px;
-  }
-  #prizeList h2 {
-    margin-bottom: 10px;
-    font-size: 5vw;
-  }
-  .prize {
-    padding: 5px;
-    margin: 5px 0;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    justify-content: space-between;
-    font-size: 4vw;
-  }
-  .done {
-    color: red;
+    margin-top: 5px;
+    font-size: 1.4em;
     font-weight: bold;
   }
 </style>
 </head>
 <body>
-
-  <h1>🎮 ユーホーキャッチャーくじ</h1>
-  <div id="game">
-    <div id="claw"></div>
-  </div>
-  <div id="controls">
-    <button onclick="moveLeft()">←</button>
-    <button onclick="moveRight()">→</button>
-    <button onclick="grab()">つかむ！</button>
+  <h1>⚾ 野球くじ ⚾</h1>
+  <button onclick="draw()">くじを引く！</button>
+  <div id="field">
+    <div id="stands"></div>
+    <div id="diamond"></div>
+    <div id="pitcher">🤾</div>
+    <div id="batter">🧍‍♂️🪓</div>
   </div>
   <div id="result"></div>
 
-  <div id="prizeList">
-    <h2>賞品リスト</h2>
-    <div class="prize" data-prize="特賞A 🎉 スペシャリティコーヒー100g">特賞A コーヒー100g <span></span></div>
-    <div class="prize" data-prize="特賞B 🎉 スペシャリティコーヒー100g">特賞B コーヒー100g <span></span></div>
-    <div class="prize" data-prize="1等 🎯 ドリップパック2個と豆">1等 ドリップパック2個と豆 <span></span></div>
-    <div class="prize" data-prize="2等 😊 ドリップパック1個と豆">2等 ドリップパック1個と豆 <span></span></div>
-    <div class="prize" data-prize="3等 🍛 カレー">3等 カレー <span></span></div>
-    <div class="prize" data-prize="4等 🍪 お菓子">4等 お菓子 <span></span></div>
-    <div class="prize" data-prize="5等 😱 なんにもない">5等 なんにもない <span></span></div>
-  </div>
-
 <script>
-  const game = document.getElementById("game");
-  const claw = document.getElementById("claw");
-  const result = document.getElementById("result");
-  const capsules = [];
   const prizes = [
-    "特賞A 🎉 スペシャリティコーヒー100g",
-    "特賞B 🎉 スペシャリティコーヒー100g",
-    "1等 🎯 ドリップパック2個と豆",
-    "2等 😊 ドリップパック1個と豆",
-    "3等 🍛 カレー",
-    "4等 🍪 お菓子",
-    "5等 😱 なんにもない"
+    { text:"特賞A 🎉 場外ホームラン", anim:"homerun" },
+    { text:"特賞B 🎉 満塁ホームラン", anim:"grandSlam" },
+    { text:"1等 🎯 3ベースヒット", anim:"triple" },
+    { text:"2等 😊 2ベースヒット", anim:"double" },
+    { text:"3等 🙌 スクイズ成功", anim:"squeeze" },
+    { text:"4等 😎 セフティバント成功", anim:"bunt" },
+    { text:"5等 🚀 盗塁成功", anim:"steal" },
+    { text:"6等 💥 デッドボール", anim:"deadball" }
   ];
 
-  // シャッフルして賞品をカプセルに割り当て
-  const shuffledPrizes = prizes.sort(() => Math.random() - 0.5);
+  const field = document.getElementById("field");
+  const resultBox = document.getElementById("result");
 
-  shuffledPrizes.forEach((p, i) => {
-    const c = document.createElement("div");
-    c.className = "capsule";
-    c.style.left = (10 + i * 13) + "%";
-    c.dataset.prize = p;
-    c.textContent = i + 1; // 番号だけ表示
-    game.appendChild(c);
-    capsules.push(c);
-  });
-
-  let clawPos = 0;
-
-  function moveLeft() {
-    if (clawPos > 0) {
-      clawPos--;
-      claw.style.left = (10 + clawPos * 13) + "%";
-    }
+  function clearField(){
+    // 既存アニメを消す
+    document.querySelectorAll(".ball,.runner,.firework").forEach(el=>el.remove());
   }
 
-  function moveRight() {
-    if (clawPos < capsules.length - 1) {
-      clawPos++;
-      claw.style.left = (10 + clawPos * 13) + "%";
+  function draw(){
+    clearField();
+    const prize = prizes[Math.floor(Math.random()*prizes.length)];
+    resultBox.textContent = prize.text;
+
+    if(prize.anim==="homerun"){
+      const ball=document.createElement("div");
+      ball.textContent="⚾";
+      ball.className="ball fly";
+      ball.style.left="55%";
+      ball.style.bottom="20%";
+      field.appendChild(ball);
+
+      // 花火演出
+      setTimeout(()=>{
+        for(let i=0;i<3;i++){
+          const f=document.createElement("div");
+          f.textContent="🎆";
+          f.className="firework";
+          f.style.left=(30+40*Math.random())+"%";
+          f.style.top=(5+20*Math.random())+"%";
+          field.appendChild(f);
+        }
+      },2000);
     }
-  }
-
-  function grab() {
-    const capsule = capsules[clawPos];
-    if (!capsule) return;
-
-    const prize = capsule.dataset.prize;
-    result.textContent = "🎊 カプセルの中身は… " + prize;
-
-    // リストに「済」マーク
-    document.querySelectorAll("#prizeList .prize").forEach(p => {
-      if (p.dataset.prize === prize) {
-        p.querySelector("span").textContent = "済";
-        p.querySelector("span").classList.add("done");
+    else if(prize.anim==="grandSlam"){
+      for(let i=0;i<4;i++){
+        const r=document.createElement("div");
+        r.textContent="🏃";
+        r.className="runner run";
+        r.style.animationDelay=(i*0.5)+"s";
+        field.appendChild(r);
       }
-    });
-
-    // カプセルを取り除く（次の人のために空にする）
-    capsule.remove();
-    capsules[clawPos] = null;
+      setTimeout(()=>{
+        const f=document.createElement("div");
+        f.textContent="🎇";
+        f.className="firework";
+        field.appendChild(f);
+      },2500);
+    }
+    else if(prize.anim==="triple"){
+      const r=document.createElement("div");
+      r.textContent="🏃";
+      r.className="runner run";
+      field.appendChild(r);
+    }
+    else if(prize.anim==="double"){
+      const r=document.createElement("div");
+      r.textContent="🏃";
+      r.className="runner run";
+      r.style.animationDuration="2s";
+      field.appendChild(r);
+    }
+    else if(prize.anim==="squeeze"){
+      const b=document.createElement("div");
+      b.textContent="⚾➡️🏃";
+      b.className="ball";
+      b.style.left="50%";
+      b.style.bottom="25%";
+      b.style.opacity=1;
+      field.appendChild(b);
+    }
+    else if(prize.anim==="bunt"){
+      const b=document.createElement("div");
+      b.textContent="⚾";
+      b.className="ball";
+      b.style.left="52%";
+      b.style.bottom="18%";
+      b.style.opacity=1;
+      field.appendChild(b);
+    }
+    else if(prize.anim==="steal"){
+      const r=document.createElement("div");
+      r.textContent="🏃💨";
+      r.className="runner run";
+      field.appendChild(r);
+    }
+    else if(prize.anim==="deadball"){
+      const b=document.createElement("div");
+      b.textContent="💥⚾🤕";
+      b.className="ball";
+      b.style.left="55%";
+      b.style.bottom="20%";
+      b.style.opacity=1;
+      field.appendChild(b);
+    }
   }
 </script>
-
 </body>
 </html>
