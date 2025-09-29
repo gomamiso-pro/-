@@ -52,6 +52,26 @@
             color: #5a463b;
         }
 
+        /* ログイン画面 */
+        #login-page input {
+            width: 80%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        #login-page button {
+            background-color: #5a463b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
         /* ホーム画面 */
         #home-page .ticket-balance {
             background-color: #e0d8d2;
@@ -73,90 +93,35 @@
             color: #5a463b;
             margin: 10px 0 0;
         }
-        #home-page .qr-button {
+
+        /* 会員カード画面 */
+        #card-page .card-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #card-page .card-container p {
+            margin: 5px 0;
+        }
+
+        /* 会員登録変更画面 */
+        #account-page input {
+            width: 80%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        #account-page button {
             background-color: #5a463b;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 10px 20px;
             border-radius: 50px;
-            font-size: 1rem;
-            font-weight: bold;
+            margin-top: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            width: 80%;
-        }
-        #home-page .qr-button:hover {
-            background-color: #3b2c22;
-        }
-        #home-page .recent-history {
-            width: 100%;
-            margin-top: 30px;
-        }
-        #home-page .recent-history h3 {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        #home-page .history-list {
-            list-style: none;
-            padding: 0;
-        }
-        #home-page .history-list li {
-            background-color: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        #home-page .history-list .date {
-            font-weight: bold;
-            color: #5a463b;
-        }
-        #home-page .history-list .details {
-            text-align: right;
-        }
-        #home-page .history-list .store {
-            color: #8c786a;
-            font-size: 0.9rem;
-        }
-        #home-page .history-list .count {
-            color: #d9534f;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        /* QRコード画面 */
-        #qr-page .qr-code-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        #qr-page img {
-            width: 200px;
-            height: 200px;
-        }
-        #qr-page .ticket-info {
-            text-align: center;
-            margin-top: 15px;
-            line-height: 1.5;
-        }
-        #qr-page .ticket-info p {
-            margin: 5px 0;
-            color: #5a463b;
-        }
-        #qr-page .ticket-info span {
-            font-weight: bold;
-        }
-        #qr-page .caution {
-            text-align: center;
-            color: #8c786a;
-            font-size: 0.9rem;
-            margin-top: 20px;
         }
 
         /* 履歴画面 */
@@ -174,32 +139,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        #history-page .history-date {
-            font-weight: bold;
-            color: #5a463b;
-            font-size: 1rem;
-        }
-        #history-page .history-details {
-            text-align: right;
-        }
-        #history-page .history-details .store-name {
-            color: #8c786a;
-            font-size: 0.9rem;
-        }
-        #history-page .history-details .used-count {
-            color: #d9534f;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        #history-page .ticket-type {
-            font-size: 0.8rem;
-            background-color: #5a463b;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 10px;
-            vertical-align: middle;
         }
 
         /* ナビゲーション */
@@ -237,76 +176,64 @@
     <div class="container">
         <header>Coffee Pass</header>
 
-        <div id="home-page" class="page active">
+        <!-- ログインページ -->
+        <div id="login-page" class="page active">
+            <h2>ログイン</h2>
+            <input type="text" id="username" placeholder="ユーザー名"><br>
+            <input type="password" id="password" placeholder="パスワード"><br>
+            <button onclick="login()">ログイン</button>
+            <p id="login-error" style="color:red; display:none;">ユーザー名またはパスワードが違います</p>
+        </div>
+
+        <!-- ホーム -->
+        <div id="home-page" class="page">
             <div class="ticket-balance">
                 <h3>残りチケット</h3>
                 <div class="count">7</div>
             </div>
-            <button class="qr-button" onclick="showPage('qr-page', 'qr-nav')">QRコードを表示</button>
-            <div class="recent-history">
-                <h3>最近の利用履歴</h3>
-                <ul class="history-list">
-                    <li>
-                        <span class="date">2024.03.10</span>
-                        <div class="details">
-                            <span class="store">Cafe Mocha</span><br>
-                            <span class="count">-1枚</span>
-                        </div>
-                    </li>
-                </ul>
-                <p style="text-align: center; margin-top: 10px;"><a href="#" onclick="showPage('history-page', 'history-nav')">履歴をすべて見る</a></p>
+        </div>
+
+        <!-- 会員カード -->
+        <div id="card-page" class="page">
+            <h2>会員カード</h2>
+            <div class="card-container">
+                <p><strong>会員名：</strong> guest</p>
+                <p><strong>会員番号：</strong> 000123</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MEMBER_guest" alt="会員QR">
             </div>
         </div>
 
-        <div id="qr-page" class="page">
-            <h2>ご利用のQRコード</h2>
-            <div class="qr-code-container">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=COFFEE_TICKET_12345" alt="QR Code">
-            </div>
-            <div class="ticket-info">
-                <p>チケット種別：<span>ドリンクチケット</span></p>
-                <p>利用枚数：<span>1枚</span></p>
-            </div>
-            <p class="caution">※ご利用の際は、お店のスタッフにお見せください。</p>
+        <!-- 会員登録変更 -->
+        <div id="account-page" class="page">
+            <h2>会員登録変更</h2>
+            <input type="text" placeholder="新しいユーザー名"><br>
+            <input type="password" placeholder="新しいパスワード"><br>
+            <button>変更する</button>
         </div>
 
+        <!-- 利用履歴 -->
         <div id="history-page" class="page">
             <h2>利用履歴</h2>
             <ul>
                 <li>
                     <span class="history-date">2024.03.10</span>
-                    <div class="history-details">
-                        <span class="store-name">Cafe Mocha</span>
-                        <span class="ticket-type">デジタル</span>
-                        <br>
-                        <span class="used-count">-1枚</span>
-                    </div>
+                    <span>-1枚 (Cafe Mocha)</span>
                 </li>
                 <li>
                     <span class="history-date">2024.03.05</span>
-                    <div class="history-details">
-                        <span class="store-name">Cafe Mocha</span>
-                        <span class="ticket-type">紙</span>
-                        <br>
-                        <span class="used-count">-1枚</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="history-date">2024.02.05</span>
-                    <div class="history-details">
-                        <span class="store-name">Cafe Latte</span>
-                        <span class="ticket-type">デジタル</span>
-                        <br>
-                        <span class="used-count">-1枚</span>
-                    </div>
+                    <span>-1枚 (Cafe Latte)</span>
                 </li>
             </ul>
         </div>
     </div>
 
-    <nav class="navigation">
+    <!-- ナビゲーション -->
+    <nav class="navigation" style="display:none;">
         <button id="home-nav" class="active" onclick="showPage('home-page', 'home-nav')">ホーム</button>
-        <button id="history-nav" onclick="showPage('history-page', 'history-nav')">履歴</button>
+        <button id="card-nav" onclick="showPage('card-page', 'card-nav')">会員カード</button>
+        <button id="account-nav" onclick="showPage('account-page', 'account-nav')">会員登録変更</button>
+        <button id="history-nav" onclick="showPage('history-page', 'history-nav')">利用履歴</button>
+        <button id="logout-nav" onclick="logout()">ログアウト</button>
     </nav>
 
     <script>
@@ -320,6 +247,25 @@
             if (navId) {
                 document.getElementById(navId).classList.add('active');
             }
+        }
+
+        function login() {
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+            if (user === "guest" && pass === "123") {
+                document.getElementById("login-page").classList.remove("active");
+                document.getElementById("home-page").classList.add("active");
+                document.querySelector(".navigation").style.display = "flex";
+                document.getElementById("login-error").style.display = "none";
+            } else {
+                document.getElementById("login-error").style.display = "block";
+            }
+        }
+
+        function logout() {
+            document.querySelector(".navigation").style.display = "none";
+            document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+            document.getElementById("login-page").classList.add("active");
         }
     </script>
 </body>
