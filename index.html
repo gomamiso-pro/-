@@ -11,14 +11,12 @@
       padding: 0;
       background-color: #f7f3f0;
       color: #3b2c22;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       min-height: 100vh;
     }
     .container {
       width: 100%;
       max-width: 400px;
+      margin: auto;
       padding: 20px;
       box-sizing: border-box;
     }
@@ -27,29 +25,104 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      padding-bottom: 70px;
+      padding-top: 60px;
+      padding-bottom: 20px;
     }
     .page.active { display: flex; }
 
     header {
       width: 100%;
       max-width: 400px;
-      text-align: center;
-      padding: 20px 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.5rem;
       font-weight: bold;
       color: #5a463b;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f7f3f0;
+      z-index: 100;
     }
+
+    /* ハンバーガーメニュー */
+    .hamburger {
+      position: absolute;
+      left: 15px;
+      top: 12px;
+      width: 30px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 150;
+    }
+    .hamburger span {
+      display: block;
+      height: 4px;
+      background: #5a463b;
+      border-radius: 2px;
+    }
+
+    /* サイドメニュー */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 200px;
+      height: 100%;
+      background: white;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+      padding: 60px 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      transition: left 0.3s ease;
+      z-index: 200;
+    }
+    .side-menu.active { left: 0; }
+
+    .side-menu button {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      color: #5a463b;
+      text-align: left;
+      cursor: pointer;
+      padding: 10px;
+    }
+    .side-menu button:hover {
+      background: #f0e9e5;
+      border-radius: 8px;
+    }
+
+    /* メニュー開いた時のオーバーレイ */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      z-index: 100;
+    }
+    .overlay.active { display: block; }
+
+    /* 共通 */
     h2 {
       font-size: 1.2rem;
       margin-bottom: 20px;
       color: #5a463b;
     }
-
-    /* 戻るボタン */
     .back-btn {
       align-self: flex-start;
-      margin: 10px 0 20px 0;
+      margin-bottom: 10px;
       background: none;
       border: none;
       color: #5a463b;
@@ -58,8 +131,6 @@
       cursor: pointer;
     }
     .back-btn:hover { text-decoration: underline; }
-
-    /* 入力フォーム */
     input {
       width: 80%;
       padding: 10px;
@@ -67,7 +138,7 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-    button {
+    button.main {
       background-color: #5a463b;
       color: white;
       border: none;
@@ -78,55 +149,33 @@
       cursor: pointer;
       margin-top: 10px;
     }
-    button:hover { background-color: #3b2c22; }
+    button.main:hover { background-color: #3b2c22; }
     a { color: #5a463b; cursor: pointer; }
-
-    /* ナビゲーション */
-    .navigation {
-      width: 100%;
-      max-width: 400px;
-      position: fixed;
-      bottom: 0;
-      background-color: white;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      border-top-left-radius: 15px;
-      border-top-right-radius: 15px;
-      box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .navigation button {
-      background: none;
-      border: none;
-      font-size: 0.8rem;
-      color: #8c786a;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-weight: bold;
-    }
-    .navigation button.active { color: #5a463b; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <header>Coffee Pass</header>
+  <header>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+    Coffee Pass
+  </header>
 
   <!-- ログインページ -->
   <div id="login-page" class="page active">
     <h2>ログイン</h2>
     <input type="text" id="username" placeholder="ユーザー名"><br>
     <input type="password" id="password" placeholder="パスワード"><br>
-    <button onclick="login()">ログイン</button>
+    <button class="main" onclick="login()">ログイン</button>
     <p id="login-error" style="color:red; display:none;">ユーザー名またはパスワードが違います</p>
-    <p>新規の方は <a onclick="showPage('account-page','')">こちらから登録</a></p>
+    <p>新規の方は <a onclick="showPage('account-page')">こちらから登録</a></p>
   </div>
 
   <!-- ホーム -->
   <div id="home-page" class="page">
-    <button class="back-btn" onclick="logout()">← ログアウトして戻る</button>
+    <button class="back-btn" onclick="logout()">← ログアウト</button>
     <h2>ホーム</h2>
     <div class="ticket-balance">
       <h3>残りチケット</h3>
@@ -136,28 +185,26 @@
 
   <!-- 会員カード -->
   <div id="card-page" class="page">
-    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
+    <button class="back-btn" onclick="showPage('home-page')">← ホームに戻る</button>
     <h2>会員カード</h2>
-    <div class="card-container">
-      <p><strong>会員名：</strong> <span id="member-name">guest</span></p>
-      <p><strong>会員番号：</strong> <span id="member-id">000123</span></p>
-      <img id="member-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MEMBER_guest" alt="会員QR">
-    </div>
+    <p><strong>会員名：</strong> <span id="member-name">guest</span></p>
+    <p><strong>会員番号：</strong> <span id="member-id">000123</span></p>
+    <img id="member-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MEMBER_guest" alt="会員QR">
   </div>
 
   <!-- 会員登録変更 -->
   <div id="account-page" class="page">
-    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
+    <button class="back-btn" onclick="showPage('home-page')">← ホームに戻る</button>
     <h2>会員登録 / 情報変更</h2>
     <input type="text" id="new-username" placeholder="新しいユーザー名"><br>
     <input type="password" id="new-password" placeholder="新しいパスワード"><br>
-    <button onclick="updateAccount()">登録 / 更新</button>
+    <button class="main" onclick="updateAccount()">登録 / 更新</button>
     <p id="update-message" style="color:green; display:none;">登録情報を更新しました</p>
   </div>
 
   <!-- 利用履歴 -->
   <div id="history-page" class="page">
-    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
+    <button class="back-btn" onclick="showPage('home-page')">← ホームに戻る</button>
     <h2>利用履歴</h2>
     <ul>
       <li>2024.03.10 -1枚 (Cafe Mocha)</li>
@@ -166,41 +213,30 @@
   </div>
 </div>
 
-<!-- ナビゲーション -->
-<nav class="navigation" style="display:none;">
-  <button id="home-nav" class="active" onclick="showPage('home-page', 'home-nav')">ホーム</button>
-  <button id="card-nav" onclick="showPage('card-page', 'card-nav')">会員カード</button>
-  <button id="account-nav" onclick="showPage('account-page', 'account-nav')">会員登録変更</button>
-  <button id="history-nav" onclick="showPage('history-page', 'history-nav')">利用履歴</button>
-  <button id="logout-nav" onclick="logout()">ログアウト</button>
-</nav>
+<!-- サイドメニュー -->
+<div class="side-menu" id="sideMenu">
+  <button onclick="showPage('home-page'); closeMenu()">ホーム</button>
+  <button onclick="showPage('card-page'); closeMenu()">会員カード</button>
+  <button onclick="showPage('account-page'); closeMenu()">会員登録変更</button>
+  <button onclick="showPage('history-page'); closeMenu()">利用履歴</button>
+  <button onclick="logout(); closeMenu()">ログアウト</button>
+</div>
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
 <script>
-  // デフォルトアカウント
   let account = { username: "guest", password: "123", memberId: "000123" };
 
-  function showPage(pageId, navId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.remove('active'));
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
-
-    const navButtons = document.querySelectorAll('.navigation button');
-    navButtons.forEach(button => button.classList.remove('active'));
-    if (navId) {
-      const nav = document.getElementById(navId);
-      if (nav) nav.classList.add('active');
-    }
   }
 
   function login() {
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
     if (user === account.username && pass === account.password) {
-      document.getElementById("login-page").classList.remove("active");
-      document.getElementById("home-page").classList.add("active");
-      document.querySelector(".navigation").style.display = "flex";
+      showPage("home-page");
       document.getElementById("login-error").style.display = "none";
-      // 会員カード情報更新
       document.getElementById("member-name").textContent = account.username;
       document.getElementById("member-id").textContent = account.memberId;
       document.getElementById("member-qr").src =
@@ -211,9 +247,7 @@
   }
 
   function logout() {
-    document.querySelector(".navigation").style.display = "none";
-    document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
-    document.getElementById("login-page").classList.add("active");
+    showPage("login-page");
   }
 
   function updateAccount() {
@@ -226,6 +260,16 @@
       document.getElementById("update-message").style.display = "block";
       setTimeout(() => { document.getElementById("update-message").style.display = "none"; }, 2000);
     }
+  }
+
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("active");
+    document.getElementById("overlay").classList.toggle("active");
+  }
+
+  function closeMenu() {
+    document.getElementById("sideMenu").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
   }
 </script>
 </body>
