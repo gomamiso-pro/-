@@ -46,6 +46,19 @@
       color: #5a463b;
     }
 
+    /* 戻るボタン */
+    .back-btn {
+      align-self: flex-start;
+      margin: 10px 0 20px 0;
+      background: none;
+      border: none;
+      color: #5a463b;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .back-btn:hover { text-decoration: underline; }
+
     /* 入力フォーム */
     input {
       width: 80%;
@@ -113,6 +126,7 @@
 
   <!-- ホーム -->
   <div id="home-page" class="page">
+    <button class="back-btn" onclick="logout()">← ログアウトして戻る</button>
     <h2>ホーム</h2>
     <div class="ticket-balance">
       <h3>残りチケット</h3>
@@ -122,6 +136,7 @@
 
   <!-- 会員カード -->
   <div id="card-page" class="page">
+    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
     <h2>会員カード</h2>
     <div class="card-container">
       <p><strong>会員名：</strong> <span id="member-name">guest</span></p>
@@ -132,6 +147,7 @@
 
   <!-- 会員登録変更 -->
   <div id="account-page" class="page">
+    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
     <h2>会員登録 / 情報変更</h2>
     <input type="text" id="new-username" placeholder="新しいユーザー名"><br>
     <input type="password" id="new-password" placeholder="新しいパスワード"><br>
@@ -141,6 +157,7 @@
 
   <!-- 利用履歴 -->
   <div id="history-page" class="page">
+    <button class="back-btn" onclick="showPage('home-page','home-nav')">← ホームに戻る</button>
     <h2>利用履歴</h2>
     <ul>
       <li>2024.03.10 -1枚 (Cafe Mocha)</li>
