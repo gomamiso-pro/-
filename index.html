@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>野球×コーヒー ガチャ抽選</title>
+<title>野球×コーヒー ガチャ抽選 豪華版</title>
 <style>
 body{
   margin:0;
@@ -142,13 +142,12 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   left:0;
   width:100%;
   height:100%;
-  /* 豪華布風グラデーション */
   background: repeating-linear-gradient(
       45deg,
-      #b8860b,
-      #b8860b 10px,
-      #ffd700 10px,
-      #ffd700 20px
+      #d62828,
+      #d62828 12px,
+      #fff 12px,
+      #fff 24px
     );
   border-radius:12px;
   animation:wave 1s ease-in-out infinite alternate;
@@ -160,23 +159,23 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   100%{transform:translateX(5px);}
 }
 
-#message img{
+#messageContent{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.4);
+  border-radius:12px;
+  padding:12px;
+}
+#messageContent img{
   width:100px;
   height:100px;
   object-fit:cover;
   border-radius:12px;
   margin:6px;
   box-shadow:0 4px 12px rgba(0,0,0,0.4);
-}
-#messageContent{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  backdrop-filter: blur(4px);
-  background: rgba(0,0,0,0.3);
-  border-radius:12px;
-  padding:8px 12px;
 }
 </style>
 </head>
@@ -310,17 +309,24 @@ startGacha.addEventListener('click',()=>{
 
   setTimeout(()=>{
     messageContent.innerHTML='';
+    const logo=document.createElement('img');
+    logo.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAA…'; // ここに提示のアイコンbase64でも可
+    logo.style.width='80px';
+    logo.style.height='80px';
     const memberImg=document.createElement('img');
     memberImg.src=member.src;
     const prizeImg=document.createElement('img');
     prizeImg.src=p.src;
     const text=document.createElement('div');
     text.textContent=`${member.name} さんの当たりは: ${p.name} 🎉`;
+    messageContent.appendChild(logo);
     messageContent.appendChild(memberImg);
     messageContent.appendChild(prizeImg);
     messageContent.appendChild(text);
     message.classList.add('show');
-    setTimeout(()=>message.classList.remove('show'),2500);
+
+    // 画面タッチで閉じる
+    message.addEventListener('click',()=>{message.classList.remove('show');},{once:true});
   },1600);
 });
 </script>
