@@ -205,6 +205,7 @@
         .memberCard {
             border: 3px solid #0a1931;
             padding: 8px 4px;
+            cursor: pointer; /* 削除のためにタップ可能に */
         }
         .memberCard img {
             width: 80px;
@@ -397,7 +398,8 @@
             font-size: 12px;
             color: #0a1931;
             margin-top: 4px;
-            word-break: keep-all; 
+            word-break: break-word; 
+            max-width: 70px;
         }
 
     </style>
@@ -427,7 +429,8 @@
 
         <h2 class="section-title">👤 野球チームメンバー登録</h2>
         
-        <h3 class="section-title">フォルダからメンバーを選択 (タップで登録)</h3>
+        <h3 class="section-title">フォルダ内の画像を選択 (タップで登録)</h3>
+        <p style="font-size: 12px; color: #d62828;">※ JavaScriptコード内のリストを編集して画像を追加してください。</p>
         <div id="folderMembers">
             </div>
         
@@ -435,12 +438,12 @@
         <section class="form-section" id="memberForm">
             <label for="memberImg">メンバー写真</label>
             <input type="file" id="memberImg" accept="image/*">
-            <label for="memberName">メンバー名 (空欄可)</label>
-            <input type="text" id="memberName" placeholder="例: 山田 太郎">
+            <label for="memberName">メンバー名 (空欄の場合ファイル名を使用)</label>
+            <input type="text" id="memberName" placeholder="例: 山田 太郎 (空欄可)">
             <button id="addMember" class="action-button ball-button">追加</button>
         </section>
 
-        <h2 class="section-title">🧑‍🤝‍🧑 メンバーリスト</h2>
+        <h2 class="section-title">🧑‍🤝‍🧑 メンバーリスト (タップで解除)</h2>
         <div class="scrollContainer" id="memberStage">
             </div>
 
@@ -482,15 +485,15 @@
         let balls = [];
         let results = []; 
 
-        // 🔥 フォルダ内に存在するメンバー画像ファイル名 (ダミーデータ)
-        // jpeg/jpg/pngに対応
-        const folderMemberData = [
-            { name: "", file: "member/1.jpg" },
-            { name: "", file: "member/2.png" },
-            { name: "", file: "member/3.png" },
-            { name: "", file: "member/4.png" },
-            { name: "", file: "member/5.png" },
-            { name: "", file: "member/6.png" },
+        // フォルダ内に存在する画像ファイル名のリスト (手動で更新が必要です)
+        const memberFileNames = [
+            "yamada.jpg",
+            "sato.jpeg",
+            "tanaka.png",
+            "takahashi.jpg",
+            "itou.png",
+            "kato.jpeg",
+            // メンバー画像を新しく追加したら、ここにファイル名を追記してください。
         ];
 
         /**
@@ -514,30 +517,30 @@
         
         /**
          * メンバー登録を実行する共通関数
-         * @param {string} name - メンバー名
+         * @param {string} rawName - メンバー名 (空欄可)
          * @param {string} src - 画像のデータURLまたはパス
          */
         function registerMember(rawName, src) {
              let name = rawName ? rawName.trim() : '';
              
-             // 🔥 名前が空欄の場合、ファイル名から名前を生成
+             // 名前が空欄の場合、ファイル名から名前を生成
              if (name === '') {
-                 // パスからファイル名を抽出 (例: member/yamada.jpg -> yamada)
-                 const fileName = src.substring(src.lastIndexOf('/') + 1);
-                 name = fileName.substring(0, fileName.lastIndexOf('.')) || '名無し';
+                 const fileNameWithExt = src.substring(src.lastIndexOf('/') + 1);
+                 name = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.')) || '名無し';
              }
 
-            // 重複チェック (名前と画像ソースが完全に一致する場合)
-            const isDuplicate = members.some(m => m.src === src); // 画像URL/データURLが同じなら重複と見なす
+            // 画像ソースが同じなら重複と見なす (renderFolderMembersでフィルターされるため、ここでは不要だが念のため)
+            const isDuplicate = members.some(m => m.src === src); 
             if (isDuplicate) {
                 alert(`${name} さん (または同じ画像) はすでにメンバーリストに登録されています。`);
                 return;
             }
 
             const id = Date.now() + Math.random();
-            members.push({ id, name, src });
+            members.push({ id, name, src, isFolderMember: src.startsWith('member/') }); // フォルダからの登録かフラグを付ける
             renderMembers();
-            document.getElementById('memberName').value = ''; // 名前入力フィールドをクリア
+            renderFolderMembers(); // 🔥 メンバーリストが更新されたら、フォルダリストも再描画して非表示にする
+            document.getElementById('memberName').value = ''; 
         }
 
         // --- イベントリスナー ---
@@ -564,12 +567,11 @@
             reader.readAsDataURL(file);
         });
 
-        // 🔥 新規メンバー追加 (ファイル/カメラ)
+        // 新規メンバー追加 (ファイル/カメラ)
         document.getElementById('addMember').addEventListener('click', () => {
             const file = memberImgInput.files[0];
             let name = document.getElementById('memberName').value.trim();
             
-            // 🔥 ファイルが選択されていることのみを必須とする
             if (!file) {
                 alert('メンバー写真を選択してください。');
                 return;
@@ -594,10 +596,14 @@
             createGachaBalls();
         }
 
-        // メンバー削除関数
+        /**
+         * メンバー削除関数 (メンバーリストからのタップまたは長押し削除)
+         * @param {number} index - members配列のインデックス
+         */
         function deleteMember(index) {
             members.splice(index, 1);
             renderMembers();
+            renderFolderMembers(); // 🔥 メンバーリストが更新されたら、フォルダリストも再描画して復活させる
         }
         
         // 抽選結果からの削除関数
@@ -647,12 +653,29 @@
                 });
             }
             
-            element.addEventListener('click', (e) => {
-                if(overlay && !overlay.classList.contains('show')){
-                    clearTimer();
-                }
-                if (overlay) overlay.classList.remove('show');
-            });
+            // 🔥 メンバーリストからのタップ削除処理 (長押しでなく単なるタップで削除)
+            if (type === 'member') {
+                 element.addEventListener('click', (e) => {
+                    // 長押し削除オーバーレイが表示されていない場合のみ処理
+                    if (overlay && !overlay.classList.contains('show')) {
+                        clearTimer();
+                        e.stopPropagation();
+                        // 確認メッセージは不要、即座に削除関数を呼ぶ
+                        deleteMember(index); 
+                    } else if (overlay) {
+                        // オーバーレイが表示されている場合は非表示にする
+                        overlay.classList.remove('show');
+                    }
+                });
+            } else {
+                // その他の要素の通常のクリックイベント
+                element.addEventListener('click', (e) => {
+                    if(overlay && !overlay.classList.contains('show')){
+                        clearTimer();
+                    }
+                    if (overlay) overlay.classList.remove('show');
+                });
+            }
         }
 
         // --- 表示/レンダリング ---
@@ -687,30 +710,44 @@
                     <img src="${m.src}">
                     <div>${m.name}</div>
                     <div class="delete-overlay">
-                        **${m.name}** さんを<br>削除しますか？<br>
+                        **${m.name}** さんを<br>長押しで削除しますか？<br>
                         <button class="delete-confirm">はい</button>
                         <button class="delete-cancel">いいえ</button>
                     </div>
                 `;
                 memberStage.appendChild(div);
-                setupDeleteEvents(div, i, 'member');
+                // setupDeleteEventsの内部で、メンバーカードはタップで削除（復活）するロジックを実装
+                setupDeleteEvents(div, i, 'member'); 
             });
         }
         
         // フォルダメンバー画像の表示とクリックイベント設定
         function renderFolderMembers() {
             folderMembersContainer.innerHTML = '';
-            folderMemberData.forEach(data => {
+            
+            // 🔥 メンバーリストにすでに登録されている画像のパスをセットで取得
+            const registeredMemberSources = new Set(members.map(m => m.src));
+
+            memberFileNames.forEach(fileName => {
+                const filePath = `member/${fileName}`;
+                
+                // 🔥 登録済みのメンバーはスキップして非表示にする
+                if (registeredMemberSources.has(filePath)) {
+                    return; 
+                }
+
+                const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+                
                 const div = document.createElement('div');
                 div.className = 'folder-image-wrap';
                 div.innerHTML = `
-                    <img src="${data.file}" class="folder-image" alt="${data.name}の画像">
-                    <div>${data.name}</div>
+                    <img src="${filePath}" class="folder-image" alt="${fileName}">
+                    <div>${baseName}</div>
                 `;
                 
                 // タップ (クリック) されたらメンバーに追加
                 div.addEventListener('click', () => {
-                    registerMember(data.name, data.file);
+                    registerMember('', filePath); 
                 });
                 
                 folderMembersContainer.appendChild(div);
@@ -802,6 +839,7 @@
             if (memberIndexInMembers !== -1) {
                 members.splice(memberIndexInMembers, 1);
                 renderMembers(); // メンバーリストを更新
+                renderFolderMembers(); // 🔥 メンバーが減ったのでフォルダリストも更新
             }
 
             // 3. 抽選されたボールをガチャボールリスト (balls) から削除
