@@ -1,340 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ひも引きくじ（モバイル）</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>くじ引きゲーム</title>
 <style>
-  :root{--bg:#f6f8fb;--card:#fff;--accent:#6a9cff;}
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:var(--bg);-webkit-tap-highlight-color:transparent}
-  .app{max-width:720px;margin:0 auto;padding:16px}
-  header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  h1{font-size:18px;margin:0}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-  textarea, input[type="text"]{width:100%;padding:8px;border-radius:8px;border:1px solid #e0e6f0;background:#fff}
-  .row{display:flex;gap:8px}
-  .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;font-weight:600;box-shadow:0 6px 14px rgba(0,0,0,0.06)}
-  .small{padding:6px 8px;font-size:13px}
+:root{
+  --accent:#ff6;
+}
+body{
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  background:linear-gradient(135deg,#aee,#fdd);
+  overflow:hidden;
+  font-family:sans-serif;
+}
 
-  /* クリアボックス風のステージ */
-  .stage{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:12px;
-    margin-top:16px;
-    padding:16px;
-    border:3px solid rgba(150,150,200,0.3);
-    border-radius:16px;
-    background:rgba(255,255,255,0.55);
-    backdrop-filter: blur(8px);
-    box-shadow: inset 0 0 12px rgba(80,80,120,0.15);
-  }
+/* 透明なボックス */
+.box{
+  position:relative;
+  width:280px;
+  height:200px;
+  border:3px solid rgba(255,255,255,0.7);
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(8px);
+  border-radius:16px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,0.2);
+  overflow:hidden;
+}
 
-  /* カード */
-  .card{
-    flex:1 1 calc(45% - 10px);
-    max-width:160px;
-    min-width:120px;
-    height:200px;
-    border-radius:16px;
-    overflow:hidden;
-    position:relative;
-    background:var(--card);
-    box-shadow:0 8px 20px rgba(30,50,80,0.06);
-    display:flex;
-    align-items:end;
-    justify-content:center;
-  }
-  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .card .meta{position:relative;padding:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.45));color:#fff;width:100%;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center}
+/* カード */
+.card{
+  position:absolute;
+  width:80px;
+  height:100px;
+  background:white;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  color:#333;
+  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  transition:transform 1s ease, top 1s ease, left 1s ease;
+  z-index:1;
+}
+.card.lift{
+  z-index:10;
+  transform:translateY(-250px) rotate(0deg);
+}
 
-  /* string (中央からぐるぐる感) */
-  .string{
-    position:absolute;
-    left:50%;
-    top:-6px;
-    transform:translateX(-50%);
-    width:6px;
-    height:70%;
-    background:repeating-linear-gradient(to bottom,#fff,#ddd 6px,#ccc 12px);
-    border-radius:6px;
-    animation:wobble 2s infinite ease-in-out;
-    display:flex;
-    justify-content:center;
-    pointer-events:auto;
-    touch-action:none;
-  }
-  @keyframes wobble{
-    0%,100%{transform:translateX(-50%) rotate(-3deg);}
-    50%{transform:translateX(-50%) rotate(3deg);}
-  }
+/* 紐 */
+.string{
+  position:absolute;
+  top:-250px;
+  left:50%;
+  transform:translateX(-50%);
+  width:4px;
+  height:250px;
+  background:repeating-linear-gradient(
+    to bottom,
+    #fff,
+    #ccc 8px,
+    #999 16px
+  );
+  border-radius:4px;
+  z-index:5;
+  transition:height 1s ease;
+}
 
-  .pullHandle{
-    position:absolute;
-    bottom:calc(50% - 6px);
-    width:36px;
-    height:36px;
-    border-radius:18px;
-    background:#fff;
-    border:2px solid var(--accent);
-    color:var(--accent);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:18px;
-    box-shadow:0 4px 10px rgba(20,40,80,0.08);
-  }
-
-  /* モーダル */
-  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .18s}
-  .overlay.show{opacity:1;pointer-events:auto}
-  .modal{background:#fff;padding:18px;border-radius:12px;max-width:92%;text-align:center}
-  .prizeName{font-size:20px;font-weight:800;margin:8px 0}
-  .smallmuted{font-size:12px;color:#666;margin-top:6px}
-  .controls-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
-  .hint{font-size:12px;color:#666;margin-top:8px}
-
-  /* 超小さい画面は1列 */
-  @media (max-width:420px){ .card{flex:1 1 100%;max-width:100%;} }
+/* 先端のつまみ */
+.handle{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  background:#fff;
+  border:2px solid var(--accent);
+  padding:6px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:14px;
+  z-index:6;
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <h1>ひも引きくじ（モバイル）</h1>
-  </header>
 
-  <div class="controls">
-    <div style="flex:1">
-      <label><strong>賞リスト（1行に1つ）</strong></label>
-      <textarea id="prizeInput" rows="3" placeholder="例：A賞 - ギフト券\nB賞 - お菓子セット\nC賞 - ドリンク"></textarea>
-    </div>
-    <div style="width:120px">
-      <label><strong>サンプル追加</strong></label>
-      <div class="row" style="margin-top:6px">
-        <button class="btn small" id="addSample">サンプル</button>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-bottom:10px">
-    <label><strong>メンバー写真（複数可）</strong></label>
-    <div class="row" style="margin-top:6px">
-      <input type="file" id="imgInput" accept="image/*" multiple />
-      <input type="text" id="nameInput" placeholder="名前（任意）" />
-      <button class="btn small" id="addMember">追加</button>
-    </div>
-    <div class="hint">※写真を選んで名前を入れ、「追加」でカードが作られます。</div>
-  </div>
-
-  <div class="stage" id="stage"></div>
-
-  <div style="margin-top:12px">
-    <button class="btn" id="resetAll">リセット（全データ削除）</button>
-  </div>
-</div>
-
-<!-- モーダル -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal">
-    <div style="font-size:14px;color:#444">おめでとう！</div>
-    <div class="prizeName" id="prizeResult">--</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn small" id="closeModal">OK</button>
-    </div>
-    <div class="smallmuted" id="modalSub"></div>
-  </div>
+<div class="box" id="box">
+  <div class="string" id="string"></div>
+  <div class="handle" id="handle">Pull!</div>
 </div>
 
 <script>
-(() => {
-  const stage = document.getElementById('stage');
-  const imgInput = document.getElementById('imgInput');
-  const nameInput = document.getElementById('nameInput');
-  const addMemberBtn = document.getElementById('addMember');
-  const prizeInput = document.getElementById('prizeInput');
-  const addSample = document.getElementById('addSample');
-  const overlay = document.getElementById('overlay');
-  const prizeResult = document.getElementById('prizeResult');
-  const modalSub = document.getElementById('modalSub');
-  const closeModal = document.getElementById('closeModal');
-  const resetAll = document.getElementById('resetAll');
+const box = document.getElementById("box");
+const handle = document.getElementById("handle");
+const string = document.getElementById("string");
 
-  let members = []; // {id, name, imgSrc}
-  let prizes = [];  // strings
-  let remainingPrizes = [];
+const prizes = ["🍫","🍭","🥤","🎁","🍪","🍊"];
+let cards = [];
 
-  function uuid(){ return Math.random().toString(36).slice(2,10); }
-
-  function renderStage(){
-    stage.innerHTML = '';
-    members.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.id = m.id;
-
-      const img = document.createElement('img');
-      img.src = m.imgSrc;
-      img.alt = m.name || 'member';
-      card.appendChild(img);
-
-      // string container
-      const str = document.createElement('div');
-      str.className = 'string';
-      // handle knob
-      const knob = document.createElement('div');
-      knob.className = 'pullHandle';
-      knob.textContent = '⇩';
-      str.appendChild(knob);
-      card.appendChild(str);
-
-      // meta bar
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const left = document.createElement('div');
-      left.textContent = m.name || 'メンバー';
-      const right = document.createElement('div');
-      right.style.fontSize='12px';
-      right.style.opacity=0.85;
-      right.textContent = '残り: ' + remainingPrizes.length;
-      meta.appendChild(left); meta.appendChild(right);
-      card.appendChild(meta);
-
-      attachPullBehavior(str, card, m.id);
-
-      stage.appendChild(card);
-    });
-  }
-
-  function attachPullBehavior(strEl, cardEl, memberId){
-    let startY = 0;
-    let current = 0;
-    let pulled = false;
-    const threshold = 80;
-    const knob = strEl.querySelector('.pullHandle');
-
-    function setTranslate(y){
-      strEl.style.transform = `translateX(-50%) translateY(${y}px)`;
-      knob.style.transform = `translateY(${y}px)`;
-    }
-
-    function onPointerDown(e){
-      e.preventDefault();
-      startY = e.touches ? e.touches[0].clientY : e.clientY;
-      current = 0;
-      pulled = false;
-      window.addEventListener('touchmove', onPointerMove, {passive:false});
-      window.addEventListener('mousemove', onPointerMove);
-      window.addEventListener('touchend', onPointerUp);
-      window.addEventListener('mouseup', onPointerUp);
-    }
-
-    function onPointerMove(e){
-      e.preventDefault();
-      const y = e.touches ? e.touches[0].clientY : e.clientY;
-      const dy = Math.max(0, y - startY);
-      current = Math.min(dy, 200);
-      setTranslate(current);
-      if(current > threshold && !pulled){
-        pulled = true;
-        if(navigator.vibrate) navigator.vibrate(30);
-      }
-    }
-
-    function onPointerUp(){
-      window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('mousemove', onPointerMove);
-      window.removeEventListener('touchend', onPointerUp);
-      window.removeEventListener('mouseup', onPointerUp);
-
-      if(pulled && remainingPrizes.length > 0){
-        cardEl.style.transition = 'transform 450ms cubic-bezier(.2,.9,.22,1)';
-        cardEl.style.transform = 'translateY(-120%) scale(1.02)';
-        setTimeout(() => {
-          const prize = pickRandomPrize();
-          showPrizeModal(memberId, prize);
-          members = members.filter(m=>m.id !== memberId);
-          cardEl.style.transition = '';
-          cardEl.style.transform = '';
-          renderStage();
-        }, 220);
-      } else {
-        setTranslate(0);
-      }
-    }
-
-    knob.addEventListener('touchstart', onPointerDown, {passive:false});
-    knob.addEventListener('mousedown', onPointerDown);
-  }
-
-  function pickRandomPrize(){
-    if(remainingPrizes.length === 0) return null;
-    const idx = Math.floor(Math.random()*remainingPrizes.length);
-    return remainingPrizes.splice(idx,1)[0];
-  }
-
-  function showPrizeModal(memberId, prize){
-    prizeResult.textContent = prize || '(なし)';
-    modalSub.textContent = `引いた人: ${(members.find(m=>m.id===memberId)?.name || '（削除済み）')}`;
-    overlay.classList.add('show');
-  }
-
-  closeModal.addEventListener('click', () => {
-    overlay.classList.remove('show');
-    if(remainingPrizes.length === 0){
-      setTimeout(()=>alert('全ての賞が配布されました！'), 200);
-    }
+// カードをランダム配置
+function setupCards(){
+  prizes.forEach((p,i)=>{
+    let card = document.createElement("div");
+    card.className = "card";
+    card.textContent = p;
+    // ランダム位置
+    let top = Math.random()*100+50; // 50〜150
+    let left = Math.random()*180+20; // 20〜200
+    let rot = Math.random()*40-20;
+    card.style.top = top+"px";
+    card.style.left = left+"px";
+    card.style.transform = `rotate(${rot}deg)`;
+    box.appendChild(card);
+    cards.push(card);
   });
+}
 
-  addMemberBtn.addEventListener('click', () => {
-    const files = imgInput.files;
-    const nameVal = nameInput.value.trim();
-    if(!files || files.length===0){
-      alert('写真を選んでください。');
-      return;
-    }
-    for(let i=0;i<files.length;i++){
-      const f = files[i];
-      const reader = new FileReader();
-      reader.onload = (ev => {
-        const id = uuid();
-        members.push({id, name: nameVal || (`メンバー${members.length+1}`), imgSrc: ev.target.result});
-        renderStage();
-      });
-      reader.readAsDataURL(f);
-    }
-    imgInput.value = '';
-    nameInput.value = '';
-  });
+// 紐を引く
+handle.addEventListener("click",()=>{
+  if(cards.length===0) return;
+  let pick = cards[Math.floor(Math.random()*cards.length)];
+  pick.classList.add("lift");
+  // 紐をそのカード位置に
+  let rect = pick.getBoundingClientRect();
+  let boxRect = box.getBoundingClientRect();
+  let centerX = rect.left + rect.width/2 - boxRect.left;
+  string.style.left = centerX+"px";
+});
 
-  addSample.addEventListener('click', () => {
-    prizeInput.value = "A賞 - ギフト券\nB賞 - お菓子セット\nC賞 - ドリンク券\nD賞 - 参加賞";
-  });
-
-  prizeInput.addEventListener('change', parsePrizes);
-  prizeInput.addEventListener('blur', parsePrizes);
-
-  function parsePrizes(){
-    prizes = prizeInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
-    remainingPrizes = [...prizes];
-    renderStage();
-  }
-
-  resetAll.addEventListener('click', () => {
-    if(!confirm('全て削除しますか？')) return;
-    members = [];
-    prizes = [];
-    remainingPrizes = [];
-    prizeInput.value = '';
-    imgInput.value = '';
-    nameInput.value = '';
-    renderStage();
-  });
-
-  renderStage();
-})();
+setupCards();
 </script>
+
 </body>
 </html>
