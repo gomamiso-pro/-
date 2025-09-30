@@ -456,15 +456,30 @@
         const startGacha = document.getElementById('startGacha');
         const message = document.getElementById('message');
         const messageContent = document.getElementById('messageContent');
+        const prizeImgInput = document.getElementById('prizeImg');
+        const memberImgInput = document.getElementById('memberImg');
 
         let prizes = [];
         let members = [];
         let balls = [];
         let touchStartTimer = null; // 長押し判定用タイマー
 
+        /**
+         * ファイル入力フィールドをクリアするヘルパー関数
+         * ファイル入力のセキュリティ制約を回避するため、要素の複製でリセットする
+         * @param {HTMLElement} inputElement - クリアしたい <input type="file"> 要素
+         */
+        function resetFileInput(inputElement) {
+            const parent = inputElement.parentNode;
+            const newElement = inputElement.cloneNode(true);
+            inputElement.remove();
+            parent.appendChild(newElement);
+            return newElement;
+        }
+
         // 賞品追加
         document.getElementById('addPrize').addEventListener('click', () => {
-            const file = document.getElementById('prizeImg').files[0];
+            const file = prizeImgInput.files[0];
             const name = document.getElementById('prizeName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -477,14 +492,15 @@
                 renderPrizes();
                 createGachaBalls();
                 document.getElementById('prizeName').value = '';
-                document.getElementById('prizeImg').value = '';
+                // 修正: ファイル入力をリセット
+                resetFileInput(document.getElementById('prizeImg')); 
             };
             reader.readAsDataURL(file);
         });
 
         // メンバー追加
         document.getElementById('addMember').addEventListener('click', () => {
-            const file = document.getElementById('memberImg').files[0];
+            const file = memberImgInput.files[0];
             const name = document.getElementById('memberName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -496,7 +512,8 @@
                 members.push({ name, src });
                 renderMembers();
                 document.getElementById('memberName').value = '';
-                document.getElementById('memberImg').value = '';
+                // 修正: ファイル入力をリセット
+                resetFileInput(document.getElementById('memberImg'));
             };
             reader.readAsDataURL(file);
         });
@@ -528,6 +545,8 @@
             const deleteCancel = element.querySelector('.delete-cancel');
             
             const startTimer = () => {
+                // すでにオーバーレイが表示されていたらタイマーを起動しない
+                if (overlay.classList.contains('show')) return; 
                 timer = setTimeout(() => {
                     overlay.classList.add('show');
                 }, 700); // 700msで長押しと判定
@@ -562,9 +581,11 @@
             
             // カード自体をクリックした場合は、削除オーバーレイを隠す（通常のクリックと区別）
             element.addEventListener('click', (e) => {
-                if(e.target === element || e.target.tagName === 'IMG' || e.target.tagName === 'DIV'){
-                    overlay.classList.remove('show');
+                // 削除オーバーレイが表示されていない場合のみ通常のクリックとして扱う
+                if(!overlay.classList.contains('show')){
+                    clearTimer(); // 短いクリックはタイマーをクリア
                 }
+                overlay.classList.remove('show');
             });
         }
 
@@ -634,4 +655,73 @@
 
         // ガチャ実行
         startGacha.addEventListener('click', () => {
-            if (members.
+            if (members.length === 0 || prizes.length === 0) {
+                alert('メンバーと賞品を登録してからガチャを引いてください。');
+                return;
+            }
+
+            // すでにボールがない場合（全て抽選済み）
+            if (balls.length === 0) {
+                 alert('全ての賞品が抽選されました。リセットするにはページを更新してください。');
+                 return;
+            }
+
+            const memberIdx = Math.floor(Math.random() * members.length);
+            const member = members[memberIdx];
+            
+            const ballIdx = Math.floor(Math.random() * balls.length);
+            const { ball, p } = balls[ballIdx];
+            
+            // 抽選されたボールをリストから削除
+            balls.splice(ballIdx, 1);
+
+            // ボールを排出するアニメーション
+            const offsetY = -150; // ボールが上に飛び出す距離
+            ball.style.transition = 'transform 1s ease, top 1s ease, left 1s ease';
+            ball.style.top = parseFloat(ball.style.top) + offsetY + 'px';
+            ball.style.left = '50%';
+            ball.style.transform = 'translateX(-50%)';
+
+            setTimeout(() => {
+                ball.classList.remove('spin');
+                ball.classList.add('open');
+            }, 1000);
+
+            // 結果表示
+            setTimeout(() => {
+                messageContent.innerHTML = '<div id="banner"></div>'; // バナーを再挿入
+                
+                // メンバー画像
+                const memberImg = document.createElement('img');
+                memberImg.src = member.src;
+                memberImg.className = 'member-img';
+                
+                // 賞品画像
+                const prizeImg = document.createElement('img');
+                prizeImg.src = p.src;
+                prizeImg.className = 'prize-img';
+                
+                const text = document.createElement('div');
+                text.innerHTML = `${member.name} さんの当たりは:<br> **${p.name}** 🎉`;
+                
+                messageContent.appendChild(memberImg);
+                messageContent.appendChild(prizeImg);
+                messageContent.appendChild(text);
+                
+                message.classList.add('show');
+                
+                // 画面タッチで閉じる
+                const closeHandler = () => {
+                    message.classList.remove('show');
+                    ball.remove(); // 飛び出したボールを削除
+                    message.removeEventListener('click', closeHandler);
+                };
+                message.addEventListener('click', closeHandler, { once: true });
+            }, 1600);
+        });
+
+        // 初期表示（ページロード時）
+        createGachaBalls(); 
+    </script>
+</body>
+</html>
