@@ -3,138 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>くじ引きゲーム</title>
+<title>ガチャくじアニメ</title>
 <style>
-:root{
-  --accent:#ff6;
-}
 body{
   margin:0;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  height:100vh;
+  min-height:100vh;
   background:linear-gradient(135deg,#aee,#fdd);
-  overflow:hidden;
   font-family:sans-serif;
+  overflow:hidden;
 }
 
-/* 透明なボックス */
+/* 透明ボックス */
 .box{
   position:relative;
-  width:280px;
-  height:200px;
+  width:300px;
+  height:220px;
   border:3px solid rgba(255,255,255,0.7);
   background:rgba(255,255,255,0.25);
-  backdrop-filter:blur(8px);
   border-radius:16px;
-  box-shadow:inset 0 0 20px rgba(0,0,0,0.2);
+  backdrop-filter:blur(6px);
   overflow:hidden;
+  margin-bottom:16px;
 }
 
-/* カード */
-.card{
+/* ボール */
+.ball{
   position:absolute;
-  width:80px;
-  height:100px;
-  background:white;
-  border-radius:8px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
+  font-size:20px;
   font-weight:bold;
-  color:#333;
+  color:#fff;
+  cursor:pointer;
   box-shadow:0 4px 8px rgba(0,0,0,0.2);
   transition:transform 1s ease, top 1s ease, left 1s ease;
-  z-index:1;
-}
-.card.lift{
-  z-index:10;
-  transform:translateY(-250px) rotate(0deg);
 }
 
-/* 紐 */
-.string{
-  position:absolute;
-  top:-250px;
-  left:50%;
-  transform:translateX(-50%);
-  width:4px;
-  height:250px;
-  background:repeating-linear-gradient(
-    to bottom,
-    #fff,
-    #ccc 8px,
-    #999 16px
-  );
-  border-radius:4px;
-  z-index:5;
-  transition:height 1s ease;
+/* 回転アニメーション */
+@keyframes spin{
+  0%{transform: rotate(0deg);}
+  100%{transform: rotate(360deg);}
+}
+.ball.spin{
+  animation:spin 1.5s linear infinite;
 }
 
-/* 先端のつまみ */
+/* 紐とハンドル */
 .handle{
-  position:absolute;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
+  width:80px;
+  padding:8px 12px;
   background:#fff;
-  border:2px solid var(--accent);
-  padding:6px 12px;
-  border-radius:12px;
+  border:2px solid #f90;
+  border-radius:16px;
+  text-align:center;
+  font-weight:bold;
   cursor:pointer;
-  font-size:14px;
-  z-index:6;
+}
+
+/* カプセル開くアニメ */
+.ball.open{
+  animation:openBall 0.6s forwards;
+}
+@keyframes openBall{
+  0% {transform: scale(1);}
+  50% {transform: scale(1.2) rotate(20deg);}
+  100% {transform: scale(1) rotate(0deg);}
+}
+
+/* 当たりメッセージ */
+.message{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-size:24px;
+  font-weight:bold;
+  color:#f90;
+  background:rgba(255,255,255,0.9);
+  padding:16px 24px;
+  border-radius:16px;
+  text-align:center;
+  pointer-events:none;
+  z-index:10;
+  transition:transform 0.5s ease, opacity 0.5s ease;
+}
+.message.show{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;
 }
 </style>
 </head>
 <body>
 
-<div class="box" id="box">
-  <div class="string" id="string"></div>
-  <div class="handle" id="handle">Pull!</div>
-</div>
+<div class="box" id="box"></div>
+<div class="handle" id="handle">ガチャを回す</div>
+<div class="message" id="message">🎉 当たり！🎉</div>
 
 <script>
-const box = document.getElementById("box");
-const handle = document.getElementById("handle");
-const string = document.getElementById("string");
+const box = document.getElementById('box');
+const handle = document.getElementById('handle');
+const message = document.getElementById('message');
 
 const prizes = ["🍫","🍭","🥤","🎁","🍪","🍊"];
-let cards = [];
+let balls = [];
 
-// カードをランダム配置
-function setupCards(){
-  prizes.forEach((p,i)=>{
-    let card = document.createElement("div");
-    card.className = "card";
-    card.textContent = p;
-    // ランダム位置
-    let top = Math.random()*100+50; // 50〜150
-    let left = Math.random()*180+20; // 20〜200
-    let rot = Math.random()*40-20;
-    card.style.top = top+"px";
-    card.style.left = left+"px";
-    card.style.transform = `rotate(${rot}deg)`;
-    box.appendChild(card);
-    cards.push(card);
+// ボール作成とランダム配置
+function createBalls(){
+  prizes.forEach(p=>{
+    const ball = document.createElement('div');
+    ball.className='ball spin';
+    ball.textContent=p;
+    randomPosition(ball);
+    box.appendChild(ball);
+    balls.push(ball);
   });
 }
 
-// 紐を引く
-handle.addEventListener("click",()=>{
-  if(cards.length===0) return;
-  let pick = cards[Math.floor(Math.random()*cards.length)];
-  pick.classList.add("lift");
-  // 紐をそのカード位置に
-  let rect = pick.getBoundingClientRect();
-  let boxRect = box.getBoundingClientRect();
-  let centerX = rect.left + rect.width/2 - boxRect.left;
-  string.style.left = centerX+"px";
+function randomPosition(ball){
+  const top = Math.random()*140 + 30;
+  const left = Math.random()*200 + 20;
+  const rot = Math.random()*60-30;
+  ball.style.top = top + 'px';
+  ball.style.left = left + 'px';
+  ball.style.transform = `rotate(${rot}deg)`;
+}
+
+// ガチャ実行
+handle.addEventListener('click',()=>{
+  if(balls.length===0) return;
+  // ランダムで1個選択
+  const idx = Math.floor(Math.random()*balls.length);
+  const ball = balls[idx];
+  balls = balls.filter((b,i)=>i!==idx);
+
+  // 紐で上に移動
+  const boxRect = box.getBoundingClientRect();
+  const ballRect = ball.getBoundingClientRect();
+  const offsetY = - (ballRect.top - boxRect.top) - 100;
+  ball.style.transition = 'transform 1s ease, top 1s ease, left 1s ease';
+  ball.style.top = parseFloat(ball.style.top) + offsetY + 'px';
+
+  // 紐引き後に開くアニメ
+  setTimeout(()=>{
+    ball.classList.remove('spin');
+    ball.classList.add('open');
+  },1000);
+
+  // 開いた後に当たりメッセージ
+  setTimeout(()=>{
+    message.textContent = `🎉 ${ball.textContent} が当たり！🎉`;
+    message.classList.add('show');
+    // 2秒後に消える
+    setTimeout(()=>message.classList.remove('show'),2000);
+    // 移動済みのボールは残しておく
+  },1600);
 });
 
-setupCards();
+createBalls();
 </script>
 
 </body>
