@@ -216,13 +216,39 @@
 
         /* 削除確認メッセージ */
         .delete-overlay {
-            /* スタイルは前回のまま */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            font-size: 12px;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
         }
         .delete-overlay.show {
-            /* スタイルは前回のまま */
+            opacity: 1;
+            pointer-events: auto;
         }
         .delete-overlay button {
-            /* スタイルは前回のまま */
+            width: 80%;
+            padding: 4px;
+            margin-top: 5px;
+            font-size: 10px;
+            background: #d62828;
+            border-radius: 5px;
+            box-shadow: none;
+            cursor: pointer;
         }
 
         /* ガチャボックス */
@@ -242,7 +268,86 @@
 
         /* 当たりメッセージ (ポップアップ) */
         #message {
-           /* スタイルは前回のまま */
+            position: fixed;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            z-index: 20;
+            padding: 20px;
+            transition: transform 0.6s ease;
+            width: 80%;
+            max-width: 400px;
+            pointer-events: none; 
+            cursor: pointer; 
+        }
+
+        #message.show {
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto; 
+        }
+
+        /* 当たりメッセージの背景（横断幕） */
+        #banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                #d62828, 
+                #d62828 15px,
+                #0a1931 15px, 
+                #0a1931 30px
+            );
+            border-radius: 16px;
+            animation: wave 1s ease-in-out infinite alternate;
+            z-index: -1;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
+            border: 4px solid #fff;
+        }
+
+        /* 当たりメッセージの内容コンテナ */
+        #messageContent {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        /* メンバー画像 - 小さく丸形 */
+        #messageContent img.member-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 10px 0;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 賞品画像 - 大きく角丸四角形で背景アニメーションと同じ動き */
+        #messageContent img.prize-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px; 
+            margin: 10px 0;
+            object-fit: cover;
+            border: 6px solid #ffd700; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: wave 1s ease-in-out infinite alternate; 
+        }
+
+        #messageContent div {
+            margin-top: 10px;
+            font-family: 'Kosugi Maru', sans-serif;
+            color: #ffd700; 
+            text-shadow: 2px 2px 4px #000;
         }
 
         /* 抽選結果リストのスタイル */
@@ -257,8 +362,8 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             position: relative;
         }
-        
-        /* 🔥 既存メンバー画像リスト */
+
+        /* 既存メンバー画像リスト */
         #folderMembers {
             display: flex;
             gap: 10px;
@@ -292,7 +397,7 @@
             font-size: 12px;
             color: #0a1931;
             margin-top: 4px;
-            word-break: keep-all; /* 名前が途中で切れないように */
+            word-break: keep-all; 
         }
 
     </style>
@@ -330,7 +435,7 @@
         <section class="form-section" id="memberForm">
             <label for="memberImg">メンバー写真</label>
             <input type="file" id="memberImg" accept="image/*">
-            <label for="memberName">メンバー名</label>
+            <label for="memberName">メンバー名 (空欄可)</label>
             <input type="text" id="memberName" placeholder="例: 山田 太郎">
             <button id="addMember" class="action-button ball-button">追加</button>
         </section>
@@ -366,7 +471,7 @@
         const message = document.getElementById('message');
         const messageContent = document.getElementById('messageContent');
         const resultsList = document.getElementById('resultsList'); 
-        const folderMembersContainer = document.getElementById('folderMembers'); // 🔥 フォルダメンバーコンテナ
+        const folderMembersContainer = document.getElementById('folderMembers'); 
 
         // ファイル入力要素を初期参照
         let prizeImgInput = document.getElementById('prizeImg');
@@ -378,13 +483,14 @@
         let results = []; 
 
         // 🔥 フォルダ内に存在するメンバー画像ファイル名 (ダミーデータ)
-        // 実際にはサーバーサイドの処理が必要ですが、ここではクライアント側でシミュレーションします。
+        // jpeg/jpg/pngに対応
         const folderMemberData = [
             { name: "山田太郎", file: "member/yamada.jpg" },
-            { name: "佐藤次郎", file: "member/sato.jpg" },
+            { name: "佐藤次郎", file: "member/sato.jpeg" },
             { name: "田中三郎", file: "member/tanaka.png" },
             { name: "高橋四朗", file: "member/takahashi.jpg" },
-            // 必要に応じて画像ファイル名と名前を追記してください
+            { name: "伊藤五郎", file: "member/itou.png" },
+            { name: "加藤六郎", file: "member/kato.jpeg" },
         ];
 
         /**
@@ -407,15 +513,24 @@
         }
         
         /**
-         * 🔥 メンバー登録を実行する共通関数
+         * メンバー登録を実行する共通関数
          * @param {string} name - メンバー名
          * @param {string} src - 画像のデータURLまたはパス
          */
-        function registerMember(name, src) {
-             // 重複チェック (名前と画像ソースが完全に一致する場合)
-            const isDuplicate = members.some(m => m.name === name && m.src === src);
+        function registerMember(rawName, src) {
+             let name = rawName ? rawName.trim() : '';
+             
+             // 🔥 名前が空欄の場合、ファイル名から名前を生成
+             if (name === '') {
+                 // パスからファイル名を抽出 (例: member/yamada.jpg -> yamada)
+                 const fileName = src.substring(src.lastIndexOf('/') + 1);
+                 name = fileName.substring(0, fileName.lastIndexOf('.')) || '名無し';
+             }
+
+            // 重複チェック (名前と画像ソースが完全に一致する場合)
+            const isDuplicate = members.some(m => m.src === src); // 画像URL/データURLが同じなら重複と見なす
             if (isDuplicate) {
-                alert(`${name} さんはすでにメンバーリストに登録されています。`);
+                alert(`${name} さん (または同じ画像) はすでにメンバーリストに登録されています。`);
                 return;
             }
 
@@ -432,7 +547,7 @@
             const file = prizeImgInput.files[0];
             const name = document.getElementById('prizeName').value.trim();
             if (!file || !name) {
-                alert('写真と名前を入力してください。');
+                alert('写真と賞品名を入力してください。');
                 return;
             }
             const reader = new FileReader();
@@ -452,11 +567,14 @@
         // 🔥 新規メンバー追加 (ファイル/カメラ)
         document.getElementById('addMember').addEventListener('click', () => {
             const file = memberImgInput.files[0];
-            const name = document.getElementById('memberName').value.trim();
-            if (!file || !name) {
-                alert('写真と名前を入力してください。');
+            let name = document.getElementById('memberName').value.trim();
+            
+            // 🔥 ファイルが選択されていることのみを必須とする
+            if (!file) {
+                alert('メンバー写真を選択してください。');
                 return;
             }
+            
             const reader = new FileReader();
             reader.onload = e => {
                 const src = e.target.result;
@@ -579,7 +697,7 @@
             });
         }
         
-        // 🔥 フォルダメンバー画像の表示とクリックイベント設定
+        // フォルダメンバー画像の表示とクリックイベント設定
         function renderFolderMembers() {
             folderMembersContainer.innerHTML = '';
             folderMemberData.forEach(data => {
@@ -687,11 +805,8 @@
             }
 
             // 3. 抽選されたボールをガチャボールリスト (balls) から削除
-            // balls配列から削除するだけでなく、ガチャボックス内のDOM要素も削除する必要があります。
-            // DOM要素の削除はアニメーション後に実行されます。
-
             balls.splice(ballIdx, 1);
-            createGachaBalls(); // 残りの賞品でボールを再生成 (この方が確実)
+            createGachaBalls(); 
             
             // --- アニメーションと結果表示 ---
 
@@ -734,7 +849,7 @@
                 
                 const closeHandler = () => {
                     message.classList.remove('show');
-                    ball.remove(); // アニメーションに使ったボールをDOMから削除
+                    ball.remove(); 
                     message.removeEventListener('click', closeHandler);
                 };
                 message.addEventListener('click', closeHandler, { once: true });
@@ -742,7 +857,7 @@
         });
 
         // 初期表示（ページロード時）
-        renderFolderMembers(); // 🔥 フォルダメンバーリストの表示を追加
+        renderFolderMembers(); 
         createGachaBalls(); 
         renderResults(); 
     </script>
