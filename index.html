@@ -1,229 +1,574 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>野球×コーヒー ガチャ抽選 豪華版</title>
-<style>
-body{
-  margin:0;
-  font-family:sans-serif;
-  background:linear-gradient(120deg,#f5f0e1,#c7a17a);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-height:100vh;
-  padding:16px;
-}
-/* ヘッダー */
-header{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  padding:8px 16px;
-  background:#fff8f0;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-  border-bottom:3px solid #8b5e3c;
-}
-header img{
-  position:absolute;
-  left:16px;
-  height:50px;
-  border-radius:8px;
-}
-header h1{
-  font-family:"Brush Script MT","Pacifico","cursive";
-  font-size:32px;
-  color:#8b5e3c;
-  margin:0;
-}
-/* 入力フォーム */
-section{margin-bottom:16px;width:100%;max-width:360px;}
-label{display:block;margin-bottom:4px;font-weight:bold;}
-input,button{width:100%;margin-bottom:6px;padding:8px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;}
-button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer;}
-/* 横スクロール */
-.scrollContainer{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  max-width:100vw;
-  padding-bottom:8px;
-  padding-left:4px;
-  padding-right:4px;
-}
-/* 抽選表 */
-.prizeCard{
-  min-width:80px;
-  height:80px;
-  background:#fff0e5;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-  overflow:hidden;
-  border:2px solid #8b5e3c;
-  flex-shrink:0;
-}
-.prizeCard img{width:100%;height:50px;object-fit:cover;border-radius:6px;}
-/* メンバーカード */
-.memberCard{
-  min-width:80px;
-  text-align:center;
-  cursor:pointer;
-  background:#fff4e0;
-  border-radius:12px;
-  border:2px solid #d2691e;
-  box-shadow:0 3px 6px rgba(0,0,0,0.2);
-  flex-shrink:0;
-}
-.memberCard img{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid #fff;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-}
-/* ガチャボックス */
-#gachaBox{
-  position:relative;
-  width:200px;
-  height:220px;
-  border-radius:16px;
-  background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(8px);
-  border:3px solid rgba(139,94,60,0.7);
-  margin-bottom:16px;
-  overflow:hidden;
-}
-.ball{
-  position:absolute;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-  overflow:hidden;
-  transition:transform 1s ease, top 1s ease, left 1s ease;
-}
-.ball img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:50%;
-}
-.ball.spin{
-  animation:spin 1.5s linear infinite;
-}
-@keyframes spin{
-  0%{transform: rotate(0deg);}
-  100%{transform: rotate(360deg);}
-}
-.ball.open{
-  animation:openBall 0.6s forwards;
-}
-@keyframes openBall{
-  0% {transform: scale(1);}
-  50% {transform: scale(1.3) rotate(15deg);}
-  100% {transform: scale(1) rotate(0deg);}
-}
-/* 当たりメッセージ 横断幕 */
-#message{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) scale(0);
-  font-size:20px;
-  font-weight:bold;
-  color:#fff;
-  text-align:center;
-  pointer-events:none;
-  z-index:20;
-  padding:12px;
-}
-#message.show{
-  transform:translate(-50%,-50%) scale(1);
-  transition:transform 0.6s ease;
-}
-#banner{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: repeating-linear-gradient(
-      45deg,
-      #d62828,
-      #d62828 12px,
-      #fff 12px,
-      #fff 24px
-    );
-  border-radius:12px;
-  animation:wave 1s ease-in-out infinite alternate;
-  z-index:-1;
-  box-shadow:inset 0 0 10px rgba(0,0,0,0.5);
-}
-@keyframes wave{
-  0%{transform:translateX(-5px);}
-  100%{transform:translateX(5px);}
-}
-#messageContent{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  backdrop-filter: blur(6px);
-  background: rgba(0,0,0,0.4);
-  border-radius:12px;
-  padding:12px;
-}
-#messageContent img{
-  width:100px;
-  height:100px;
-  object-fit:cover;
-  border-radius:12px;
-  margin:6px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.4);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野球×コーヒー ガチャ抽選 豪華版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 全体設定 */
+        body {
+            margin: 0;
+            font-family: 'Kosugi Maru', sans-serif; /* 柔らかい字体 */
+            background: #e6e9f0; /* 薄いネイビー系の背景 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 60px; /* ヘッダーの高さ分スペースを空ける */
+        }
+
+        /* ヘッダー */
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #0a1931; /* ネイビー */
+            color: #fff;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* 高級感のある影 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .header-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 光沢感 */
+        }
+
+        .unizon-title {
+            font-family: 'Bebas Neue', cursive; /* 筆記体風 */
+            font-size: 28px;
+            margin: 0;
+            color: #fff;
+            text-shadow: 2px 2px 4px #d62828; /* 赤で強調 */
+        }
+
+        .content-wrap {
+            width: 100%;
+            max-width: 600px;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            color: #0a1931; /* ネイビー */
+            border-bottom: 2px solid #d62828; /* 赤の強調線 */
+            padding-bottom: 4px;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+
+        /* 入力フォーム */
+        .form-section {
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #0a1931;
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            box-sizing: border-box;
+            font-family: 'Kosugi Maru', sans-serif;
+        }
+
+        /* ボタン */
+        .action-button {
+            width: 100%;
+            margin-bottom: 6px;
+            padding: 10px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            box-sizing: border-box;
+            transition: background 0.3s, transform 0.1s;
+            font-family: 'Kosugi Maru', sans-serif;
+            box-shadow: 0 4px #0a1931; /* 押し込みエフェクト用 */
+        }
+
+        .action-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #0a1931;
+        }
+
+        .ball-button {
+            background: #d62828; /* 赤 */
+            border-radius: 50px;
+            box-shadow: 0 4px #991c1c; /* 暗い赤 */
+        }
+
+        .ball-button:active {
+            box-shadow: 0 2px #991c1c;
+        }
+
+        .large-ball-button {
+            background: linear-gradient(145deg, #0a1931, #060e1a); /* ネイビーのグラデーション */
+            color: #fff;
+            padding: 16px;
+            font-size: 18px;
+            border-radius: 50px;
+            box-shadow: 0 6px #060e1a;
+        }
+
+        .large-ball-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px #060e1a;
+        }
+
+        /* 横スクロール */
+        .scrollContainer {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .scrollContainer::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scrollContainer::-webkit-scrollbar-thumb {
+            background-color: #0a1931;
+            border-radius: 4px;
+        }
+
+        /* 抽選表 */
+        .prizeCard {
+            min-width: 90px;
+            height: 120px;
+            background: #fff;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 3px solid #d62828; /* 赤の枠線 */
+            flex-shrink: 0;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .prizeCard img {
+            width: 90%;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* メンバーカード */
+        .memberCard {
+            min-width: 90px;
+            text-align: center;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 12px;
+            border: 3px solid #0a1931; /* ネイビーの枠線 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            padding: 8px 4px;
+        }
+
+        .memberCard img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #d62828; /* 赤の縁取り */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ガチャボックス */
+        #gachaBox {
+            position: relative;
+            width: 240px;
+            height: 260px;
+            border-radius: 16px;
+            background: #e6e9f0; /* 薄い背景 */
+            border: 5px solid #0a1931; /* ネイビーの枠 */
+            margin: 16px auto;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5); /* 光沢感 */
+        }
+
+        /* ガチャボール */
+        .ball {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d62828, #a32020); /* 赤のグラデーション */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.6); /* 野球ボール風の光沢 */
+            overflow: hidden;
+            transition: transform 1s ease, top 1s ease, left 1s ease;
+            border: 2px solid #fff;
+        }
+
+        .ball img {
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #0a1931;
+            z-index: 1;
+        }
+
+        .ball.spin {
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ball.open {
+            animation: openBall 0.6s forwards;
+        }
+
+        @keyframes openBall {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3) rotate(15deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* 当たりメッセージ 横断幕 */
+        #message {
+            position: fixed;
+            top: 50%; /* 画面中央に修正 */
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            pointer-events: none;
+            z-index: 20;
+            padding: 20px;
+            transition: transform 0.6s ease;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #message.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        #banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                #d62828, /* 赤 */
+                #d62828 15px,
+                #0a1931 15px, /* ネイビー */
+                #0a1931 30px
+            );
+            border-radius: 16px;
+            animation: wave 1s ease-in-out infinite alternate;
+            z-index: -1;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
+            border: 4px solid #fff;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-8px) rotate(-1deg); }
+            100% { transform: translateX(8px) rotate(1deg); }
+        }
+
+        #messageContent {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.7); /* 黒で引き締め */
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); /* 光の輪郭 */
+            border: 2px solid #fff;
+        }
+
+        #messageContent img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+            border: 4px solid #d62828;
+        }
+
+        #messageContent div {
+            margin-top: 10px;
+            font-family: 'Kosugi Maru', sans-serif;
+            color: #ffd700; /* 金色で豪華に */
+            text-shadow: 2px 2px 4px #000;
+        }
+    </style>
 </head>
 <body>
-<header>
-  <img src="teams-r.jpg" alt="logo">
-  <h1>UNIZON</h1>
-</header>
+    <header id="header">
+        <div class="header-content">
+            <img src="teams-r.jpg" alt="チームロゴR" class="header-logo left">
+            <h1 class="unizon-title">UNIZON</h1>
+            <img src="teams-b.jpg" alt="チームロゴB" class="header-logo right">
+        </div>
+    </header>
 
-<section>
-  <label>コーヒー賞品登録（写真＋名前）</label>
-  <input type="file" id="prizeImg" accept="image/*">
-  <input type="text" id="prizeName" placeholder="賞品名">
-  <button id="addPrize">追加</button>
-</section>
-<div class="scrollContainer" id="prizeTable"></div>
-<section>
-  <label>野球チームメンバー登録（写真＋名前）</label>
-  <input type="file" id="memberImg" accept="image/*">
-  <input type="text" id="memberName" placeholder="名前">
-  <button id="addMember">追加</button>
-</section>
-<div class="scrollContainer" id="memberStage"></div>
-<div id="gachaBox"></div>
-<button id="startGacha">ガチャを引く</button>
-<div id="message">
-  <div id="banner"></div>
-  <div id="messageContent"></div>
-</div>
-<script>
-/* --- ここは前のスクリプトと同じ --- */
-</script>
+    <main class="content-wrap">
+        <h2 class="section-title">⚾️ コーヒー賞品登録</h2>
+        <section class="form-section">
+            <label for="prizeImg">賞品写真</label>
+            <input type="file" id="prizeImg" accept="image/*">
+            <label for="prizeName">賞品名</label>
+            <input type="text" id="prizeName" placeholder="例: スペシャルティ豆">
+            <button id="addPrize" class="action-button ball-button">追加</button>
+        </section>
+
+        <h2 class="section-title">🎁 抽選対象賞品</h2>
+        <div class="scrollContainer" id="prizeTable">
+            </div>
+
+        <h2 class="section-title">👤 野球チームメンバー登録</h2>
+        <section class="form-section">
+            <label for="memberImg">メンバー写真</label>
+            <input type="file" id="memberImg" accept="image/*">
+            <label for="memberName">メンバー名</label>
+            <input type="text" id="memberName" placeholder="例: 山田 太郎">
+            <button id="addMember" class="action-button ball-button">追加</button>
+        </section>
+
+        <h2 class="section-title">🧑‍🤝‍🧑 メンバーリスト</h2>
+        <div class="scrollContainer" id="memberStage">
+            </div>
+
+        <h2 class="section-title">🎰 ガチャ抽選</h2>
+        <div id="gachaBox">
+            </div>
+
+        <button id="startGacha" class="action-button large-ball-button">ガチャを引く</button>
+
+    </main>
+
+    <div id="message">
+        <div id="messageContent">
+            <div id="banner"></div>
+            </div>
+    </div>
+
+    <script>
+        const prizeTable = document.getElementById('prizeTable');
+        const memberStage = document.getElementById('memberStage');
+        const gachaBox = document.getElementById('gachaBox');
+        const startGacha = document.getElementById('startGacha');
+        const message = document.getElementById('message');
+        const messageContent = document.getElementById('messageContent');
+
+        let prizes = [];
+        let members = [];
+        let balls = [];
+
+        // ヘッダー左側のロゴを使用（パスはteams-r.jpg）
+        const logoImgSrc = 'teams-r.jpg'; 
+
+        // 賞品追加
+        document.getElementById('addPrize').addEventListener('click', () => {
+            const file = document.getElementById('prizeImg').files[0];
+            const name = document.getElementById('prizeName').value.trim();
+            if (!file || !name) {
+                alert('写真と名前を入力してください。');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const src = e.target.result;
+                prizes.push({ name, src });
+                renderPrizes();
+                createGachaBalls();
+                document.getElementById('prizeName').value = '';
+                document.getElementById('prizeImg').value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // メンバー追加
+        document.getElementById('addMember').addEventListener('click', () => {
+            const file = document.getElementById('memberImg').files[0];
+            const name = document.getElementById('memberName').value.trim();
+            if (!file || !name) {
+                alert('写真と名前を入力してください。');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const src = e.target.result;
+                members.push({ name, src });
+                renderMembers();
+                document.getElementById('memberName').value = '';
+                document.getElementById('memberImg').value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 賞品表示
+        function renderPrizes() {
+            prizeTable.innerHTML = '';
+            prizes.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'prizeCard';
+                div.innerHTML = `<img src="${p.src}"><div>${p.name}</div>`;
+                prizeTable.appendChild(div);
+            });
+        }
+
+        // メンバー表示
+        function renderMembers() {
+            memberStage.innerHTML = '';
+            members.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = 'memberCard';
+                div.innerHTML = `<img src="${m.src}"><div>${m.name}</div>`;
+                memberStage.appendChild(div);
+            });
+        }
+
+        // ガチャボール作成（画像入り）
+        function createGachaBalls() {
+            gachaBox.innerHTML = '';
+            balls = [];
+            prizes.forEach((p, i) => {
+                const ball = document.createElement('div');
+                ball.className = 'ball spin';
+                const img = document.createElement('img');
+                img.src = p.src;
+                ball.appendChild(img);
+                
+                // ガチャボックス内でのランダムな初期位置
+                const top = Math.random() * 100 + 80; 
+                const left = Math.random() * 100 + 70;
+                ball.style.top = top + 'px';
+                ball.style.left = left + 'px';
+                
+                gachaBox.appendChild(ball);
+                balls.push({ ball, p });
+            });
+        }
+
+        // ガチャ実行
+        startGacha.addEventListener('click', () => {
+            if (members.length === 0 || prizes.length === 0) {
+                alert('メンバーと賞品を登録してからガチャを引いてください。');
+                return;
+            }
+
+            // すでにボールがない場合（全て抽選済み）
+            if (balls.length === 0) {
+                 alert('全ての賞品が抽選されました。リセットするにはページを更新してください。');
+                 return;
+            }
+
+            const memberIdx = Math.floor(Math.random() * members.length);
+            const member = members[memberIdx];
+            
+            const ballIdx = Math.floor(Math.random() * balls.length);
+            const { ball, p } = balls[ballIdx];
+            
+            // 抽選されたボールをリストから削除
+            balls.splice(ballIdx, 1);
+
+            // ボールを排出するアニメーション
+            const offsetY = -150; // ボールが上に飛び出す距離
+            ball.style.transition = 'transform 1s ease, top 1s ease, left 1s ease';
+            ball.style.top = parseFloat(ball.style.top) + offsetY + 'px';
+            ball.style.left = '50%';
+            ball.style.transform = 'translateX(-50%)';
+
+            setTimeout(() => {
+                ball.classList.remove('spin');
+                ball.classList.add('open');
+            }, 1000);
+
+            // 結果表示
+            setTimeout(() => {
+                messageContent.innerHTML = '<div id="banner"></div>'; // バナーを再挿入
+                
+                // ヘッダーと同じロゴを使用
+                const logo = document.createElement('img');
+                logo.src = logoImgSrc; 
+                logo.style.width = '80px';
+                logo.style.height = '80px';
+                
+                const memberImg = document.createElement('img');
+                memberImg.src = member.src;
+                memberImg.style.border = '4px solid #fff'; // メンバー写真を白枠に
+
+                const prizeImg = document.createElement('img');
+                prizeImg.src = p.src;
+                prizeImg.style.border = '4px solid #d62828'; // 賞品写真を赤枠に
+                
+                const text = document.createElement('div');
+                text.innerHTML = `${member.name} さんの当たりは:<br> **${p.name}** 🎉`;
+                
+                messageContent.appendChild(logo);
+                messageContent.appendChild(memberImg);
+                messageContent.appendChild(prizeImg);
+                messageContent.appendChild(text);
+                
+                message.classList.add('show');
+                
+                // 画面タッチで閉じる
+                const closeHandler = () => {
+                    message.classList.remove('show');
+                    ball.remove(); // 飛び出したボールを削除
+                    message.removeEventListener('click', closeHandler);
+                };
+                message.addEventListener('click', closeHandler, { once: true });
+            }, 1600);
+        });
+
+        // 初期表示（ページロード時）
+        createGachaBalls(); 
+    </script>
 </body>
 </html>
