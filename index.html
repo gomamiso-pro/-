@@ -27,7 +27,10 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   display:flex;
   gap:8px;
   overflow-x:auto;
+  max-width:100vw;
   padding-bottom:8px;
+  padding-left:4px;
+  padding-right:4px;
 }
 
 /* 抽選表 */
@@ -139,11 +142,18 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   left:0;
   width:100%;
   height:100%;
-  background:linear-gradient(90deg,#ff8c00,#ffa500,#ff8c00);
-  animation:wave 1s ease-in-out infinite alternate;
+  /* 豪華布風グラデーション */
+  background: repeating-linear-gradient(
+      45deg,
+      #b8860b,
+      #b8860b 10px,
+      #ffd700 10px,
+      #ffd700 20px
+    );
   border-radius:12px;
+  animation:wave 1s ease-in-out infinite alternate;
   z-index:-1;
-  filter: blur(4px);
+  box-shadow:inset 0 0 10px rgba(0,0,0,0.5);
 }
 @keyframes wave{
   0%{transform:translateX(-5px);}
