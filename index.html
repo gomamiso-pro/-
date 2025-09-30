@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>写真ガチャ抽選</title>
+<title>野球×コーヒー ガチャ抽選</title>
 <style>
 body{
   margin:0;
   font-family:sans-serif;
-  background:linear-gradient(135deg,#aee,#fdd);
+  background:linear-gradient(120deg,#f5f0e1,#c7a17a);
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -20,7 +20,7 @@ body{
 section{margin-bottom:16px;width:100%;max-width:360px;}
 label{display:block;margin-bottom:4px;font-weight:bold;}
 input,textarea,button{width:100%;margin-bottom:6px;padding:8px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;}
-button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
+button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 
 /* 抽選表 */
 #prizeTable{
@@ -32,15 +32,16 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 .prizeCard{
   width:80px;
   height:80px;
-  background:#fff;
+  background:#fff0e5;
   border-radius:12px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   font-size:12px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
   overflow:hidden;
+  border:2px solid #8b5e3c;
 }
 .prizeCard img{width:100%;height:50px;object-fit:cover;border-radius:6px;}
 
@@ -55,6 +56,10 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
   width:80px;
   text-align:center;
   cursor:pointer;
+  background:#fff4e0;
+  border-radius:12px;
+  border:2px solid #d2691e;
+  box-shadow:0 3px 6px rgba(0,0,0,0.2);
 }
 .memberCard img{
   width:80px;
@@ -68,12 +73,12 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 /* ガチャボックス */
 #gachaBox{
   position:relative;
-  width:180px;
-  height:200px;
+  width:200px;
+  height:220px;
   border-radius:16px;
-  background:rgba(255,255,255,0.3);
-  backdrop-filter:blur(6px);
-  border:3px solid rgba(255,255,255,0.7);
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(8px);
+  border:3px solid rgba(139,94,60,0.7);
   margin-bottom:16px;
   overflow:hidden;
 }
@@ -85,11 +90,8 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:14px;
-  font-weight:bold;
-  color:#fff;
   cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
   overflow:hidden;
   transition:transform 1s ease, top 1s ease, left 1s ease;
 }
@@ -111,7 +113,7 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 }
 @keyframes openBall{
   0% {transform: scale(1);}
-  50% {transform: scale(1.2) rotate(20deg);}
+  50% {transform: scale(1.3) rotate(15deg);}
   100% {transform: scale(1) rotate(0deg);}
 }
 
@@ -138,7 +140,7 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
   object-fit:cover;
   border-radius:12px;
   margin:6px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
 #messageContent{
   display:flex;
@@ -150,7 +152,7 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 <body>
 
 <section>
-  <label>賞品登録（写真＋名前）</label>
+  <label>コーヒー賞品登録（写真＋名前）</label>
   <input type="file" id="prizeImg" accept="image/*">
   <input type="text" id="prizeName" placeholder="賞品名">
   <button id="addPrize">追加</button>
@@ -159,7 +161,7 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 <div id="prizeTable"></div>
 
 <section>
-  <label>メンバー登録（写真＋名前）</label>
+  <label>野球チームメンバー登録（写真＋名前）</label>
   <input type="file" id="memberImg" accept="image/*">
   <input type="text" id="memberName" placeholder="名前">
   <button id="addMember">追加</button>
@@ -175,25 +177,25 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 </div>
 
 <script>
-const prizeTable = document.getElementById('prizeTable');
-const memberStage = document.getElementById('memberStage');
-const gachaBox = document.getElementById('gachaBox');
-const startGacha = document.getElementById('startGacha');
-const message = document.getElementById('message');
-const messageContent = document.getElementById('messageContent');
+const prizeTable=document.getElementById('prizeTable');
+const memberStage=document.getElementById('memberStage');
+const gachaBox=document.getElementById('gachaBox');
+const startGacha=document.getElementById('startGacha');
+const message=document.getElementById('message');
+const messageContent=document.getElementById('messageContent');
 
-let prizes = [];
-let members = [];
-let balls = [];
+let prizes=[];
+let members=[];
+let balls=[];
 
 // 賞品追加
 document.getElementById('addPrize').addEventListener('click',()=>{
-  const file = document.getElementById('prizeImg').files[0];
-  const name = document.getElementById('prizeName').value.trim();
+  const file=document.getElementById('prizeImg').files[0];
+  const name=document.getElementById('prizeName').value.trim();
   if(!file||!name){ alert('写真と名前を入力'); return; }
-  const reader = new FileReader();
+  const reader=new FileReader();
   reader.onload=e=>{
-    const src = e.target.result;
+    const src=e.target.result;
     prizes.push({name,src});
     renderPrizes();
     createGachaBalls();
@@ -203,12 +205,12 @@ document.getElementById('addPrize').addEventListener('click',()=>{
 
 // メンバー追加
 document.getElementById('addMember').addEventListener('click',()=>{
-  const file = document.getElementById('memberImg').files[0];
-  const name = document.getElementById('memberName').value.trim();
+  const file=document.getElementById('memberImg').files[0];
+  const name=document.getElementById('memberName').value.trim();
   if(!file||!name){ alert('写真と名前を入力'); return; }
-  const reader = new FileReader();
+  const reader=new FileReader();
   reader.onload=e=>{
-    const src = e.target.result;
+    const src=e.target.result;
     members.push({name,src});
     renderMembers();
   };
@@ -292,6 +294,5 @@ startGacha.addEventListener('click',()=>{
   },1600);
 });
 </script>
-
 </body>
 </html>
