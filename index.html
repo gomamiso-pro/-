@@ -15,13 +15,79 @@
   .row{display:flex;gap:8px}
   .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;font-weight:600;box-shadow:0 6px 14px rgba(0,0,0,0.06)}
   .small{padding:6px 8px;font-size:13px}
-  .stage{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
-  .card{position:relative;background:var(--card);border-radius:14px;overflow:hidden;height:220px;box-shadow:0 8px 20px rgba(30,50,80,0.06);display:flex;align-items:end;justify-content:center}
+
+  /* クリアボックス風のステージ */
+  .stage{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin-top:16px;
+    padding:16px;
+    border:3px solid rgba(150,150,200,0.3);
+    border-radius:16px;
+    background:rgba(255,255,255,0.55);
+    backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 12px rgba(80,80,120,0.15);
+  }
+
+  /* カード */
+  .card{
+    flex:1 1 calc(45% - 10px);
+    max-width:160px;
+    min-width:120px;
+    height:200px;
+    border-radius:16px;
+    overflow:hidden;
+    position:relative;
+    background:var(--card);
+    box-shadow:0 8px 20px rgba(30,50,80,0.06);
+    display:flex;
+    align-items:end;
+    justify-content:center;
+  }
   .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .card .meta{position:relative;padding:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.45));color:#fff;width:100%;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center}
-  .string{position:absolute;left:20px;top:-6px;width:6px;height:60%;background:linear-gradient(#fff,#ddd);border-radius:6px;display:flex;align-items:flex-start;justify-content:center;pointer-events:auto;touch-action:none}
-  .string:after{content:"";width:2px;height:100%;background:#bfbfbf;border-radius:2px;transform-origin:top;display:block}
-  .pullHandle{position:absolute;left:10px;bottom:calc(50% - 6px);width:36px;height:36px;border-radius:18px;background:#fff;border:2px solid rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 10px rgba(20,40,80,0.08)}
+
+  /* string (中央からぐるぐる感) */
+  .string{
+    position:absolute;
+    left:50%;
+    top:-6px;
+    transform:translateX(-50%);
+    width:6px;
+    height:70%;
+    background:repeating-linear-gradient(to bottom,#fff,#ddd 6px,#ccc 12px);
+    border-radius:6px;
+    animation:wobble 2s infinite ease-in-out;
+    display:flex;
+    justify-content:center;
+    pointer-events:auto;
+    touch-action:none;
+  }
+  @keyframes wobble{
+    0%,100%{transform:translateX(-50%) rotate(-3deg);}
+    50%{transform:translateX(-50%) rotate(3deg);}
+  }
+
+  .pullHandle{
+    position:absolute;
+    bottom:calc(50% - 6px);
+    width:36px;
+    height:36px;
+    border-radius:18px;
+    background:#fff;
+    border:2px solid var(--accent);
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:18px;
+    box-shadow:0 4px 10px rgba(20,40,80,0.08);
+  }
+
+  /* モーダル */
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .18s}
   .overlay.show{opacity:1;pointer-events:auto}
   .modal{background:#fff;padding:18px;border-radius:12px;max-width:92%;text-align:center}
@@ -29,7 +95,9 @@
   .smallmuted{font-size:12px;color:#666;margin-top:6px}
   .controls-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
   .hint{font-size:12px;color:#666;margin-top:8px}
-  @media (max-width:420px){ .card{height:200px} .string{left:14px} .pullHandle{left:2px} }
+
+  /* 超小さい画面は1列 */
+  @media (max-width:420px){ .card{flex:1 1 100%;max-width:100%;} }
 </style>
 </head>
 <body>
@@ -58,7 +126,7 @@
       <input type="text" id="nameInput" placeholder="名前（任意）" />
       <button class="btn small" id="addMember">追加</button>
     </div>
-    <div class="hint">※写真を選んで名前を入れ、「追加」でカードが作られます。複数枚選択→一括追加も可。</div>
+    <div class="hint">※写真を選んで名前を入れ、「追加」でカードが作られます。</div>
   </div>
 
   <div class="stage" id="stage"></div>
@@ -112,7 +180,7 @@
       img.alt = m.name || 'member';
       card.appendChild(img);
 
-      // string container (left)
+      // string container
       const str = document.createElement('div');
       str.className = 'string';
       // handle knob
@@ -134,7 +202,6 @@
       meta.appendChild(left); meta.appendChild(right);
       card.appendChild(meta);
 
-      // set up dragging on knob
       attachPullBehavior(str, card, m.id);
 
       stage.appendChild(card);
@@ -145,12 +212,11 @@
     let startY = 0;
     let current = 0;
     let pulled = false;
-    const threshold = 80; // px pull distance to trigger
+    const threshold = 80;
     const knob = strEl.querySelector('.pullHandle');
 
     function setTranslate(y){
-      // visually move the knob and string
-      strEl.style.transform = `translateY(${y}px)`;
+      strEl.style.transform = `translateX(-50%) translateY(${y}px)`;
       knob.style.transform = `translateY(${y}px)`;
     }
 
@@ -173,35 +239,28 @@
       setTranslate(current);
       if(current > threshold && !pulled){
         pulled = true;
-        // optional small vibration
         if(navigator.vibrate) navigator.vibrate(30);
       }
     }
 
-    function onPointerUp(e){
+    function onPointerUp(){
       window.removeEventListener('touchmove', onPointerMove);
       window.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('touchend', onPointerUp);
       window.removeEventListener('mouseup', onPointerUp);
 
       if(pulled && remainingPrizes.length > 0){
-        // trigger reveal animation
         cardEl.style.transition = 'transform 450ms cubic-bezier(.2,.9,.22,1)';
         cardEl.style.transform = 'translateY(-120%) scale(1.02)';
-        // slight delay to show modal
         setTimeout(() => {
-          // decide prize
           const prize = pickRandomPrize();
           showPrizeModal(memberId, prize);
-          // remove member from list
           members = members.filter(m=>m.id !== memberId);
-          // cleanup transform
           cardEl.style.transition = '';
           cardEl.style.transform = '';
           renderStage();
         }, 220);
       } else {
-        // reset
         setTranslate(0);
       }
     }
@@ -213,72 +272,58 @@
   function pickRandomPrize(){
     if(remainingPrizes.length === 0) return null;
     const idx = Math.floor(Math.random()*remainingPrizes.length);
-    const p = remainingPrizes.splice(idx,1)[0];
-    return p;
+    return remainingPrizes.splice(idx,1)[0];
   }
 
   function showPrizeModal(memberId, prize){
     prizeResult.textContent = prize || '(なし)';
-    modalSub.textContent = `引いた人: ${ (members.find(m=>m.id===memberId)?.name || '（既に削除）') }`;
+    modalSub.textContent = `引いた人: ${(members.find(m=>m.id===memberId)?.name || '（削除済み）')}`;
     overlay.classList.add('show');
   }
 
   closeModal.addEventListener('click', () => {
     overlay.classList.remove('show');
-    // if no prizes left, show alert or finalize
     if(remainingPrizes.length === 0){
       setTimeout(()=>alert('全ての賞が配布されました！'), 200);
     }
   });
 
-  // Add member(s)
   addMemberBtn.addEventListener('click', () => {
     const files = imgInput.files;
     const nameVal = nameInput.value.trim();
     if(!files || files.length===0){
-      alert('写真を1枚以上選んでください。');
+      alert('写真を選んでください。');
       return;
     }
-    const readers = [];
     for(let i=0;i<files.length;i++){
       const f = files[i];
       const reader = new FileReader();
       reader.onload = (ev => {
-        const src = ev.target.result;
         const id = uuid();
-        members.push({id, name: nameVal || (`メンバー${members.length+1}`), imgSrc: src});
+        members.push({id, name: nameVal || (`メンバー${members.length+1}`), imgSrc: ev.target.result});
         renderStage();
       });
       reader.readAsDataURL(f);
-      readers.push(reader);
     }
-    // clear input
     imgInput.value = '';
     nameInput.value = '';
   });
 
-  // sample prizes
   addSample.addEventListener('click', () => {
     prizeInput.value = "A賞 - ギフト券\nB賞 - お菓子セット\nC賞 - ドリンク券\nD賞 - 参加賞";
   });
 
-  // load prizes from textarea when user focuses out or before first draw
-  prizeInput.addEventListener('change', () => {
+  prizeInput.addEventListener('change', parsePrizes);
+  prizeInput.addEventListener('blur', parsePrizes);
+
+  function parsePrizes(){
     prizes = prizeInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
     remainingPrizes = [...prizes];
     renderStage();
-  });
+  }
 
-  // also parse on blur
-  prizeInput.addEventListener('blur', () => {
-    prizes = prizeInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
-    remainingPrizes = [...prizes];
-    renderStage();
-  });
-
-  // reset
   resetAll.addEventListener('click', () => {
-    if(!confirm('全て削除してよいですか？')) return;
+    if(!confirm('全て削除しますか？')) return;
     members = [];
     prizes = [];
     remainingPrizes = [];
@@ -288,23 +333,7 @@
     renderStage();
   });
 
-  // initialize empty
   renderStage();
-
-  // small helper: if user never edited prize list, load from textarea when first pull is attempted:
-  // (We detect remainingPrizes length when user opens modal; but as a convenience, update from textarea every 2s)
-  setInterval(()=>{
-    const val = prizeInput.value;
-    const arr = val.split('\n').map(s=>s.trim()).filter(Boolean);
-    // only update if different and remainingPrizes empty
-    if(prizes.join('|') !== arr.join('|')){
-      prizes = arr;
-      // if remainingPrizes shorter than prizes, refill but keep consumed ones removed.
-      if(remainingPrizes.length === 0) remainingPrizes = [...prizes];
-      renderStage();
-    }
-  }, 2000);
-
 })();
 </script>
 </body>
