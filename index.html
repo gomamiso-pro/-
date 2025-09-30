@@ -18,6 +18,13 @@
             min-height: 100vh;
             padding-top: 60px; /* ヘッダーの高さ分スペースを空ける */
         }
+        
+        /* 🔥 長押しでシステムメニューが出ないようにする */
+        .prizeCard, .memberCard, .action-button, #message {
+            -webkit-user-select: none; /* Safari/iOS */
+            user-select: none; /* 標準 */
+            -webkit-touch-callout: none; /* iOSの長押しメニュー抑制 */
+        }
 
         /* ヘッダー */
         #header {
@@ -410,7 +417,7 @@
 
     <main class="content-wrap">
         <h2 class="section-title">⚾️ コーヒー賞品登録</h2>
-        <section class="form-section">
+        <section class="form-section" id="prizeForm">
             <label for="prizeImg">賞品写真</label>
             <input type="file" id="prizeImg" accept="image/*">
             <label for="prizeName">賞品名</label>
@@ -423,7 +430,7 @@
             </div>
 
         <h2 class="section-title">👤 野球チームメンバー登録</h2>
-        <section class="form-section">
+        <section class="form-section" id="memberForm">
             <label for="memberImg">メンバー写真</label>
             <input type="file" id="memberImg" accept="image/*">
             <label for="memberName">メンバー名</label>
@@ -464,25 +471,36 @@
         let prizes = [];
         let members = [];
         let balls = [];
-        let touchStartTimer = null; // 長押し判定用タイマー
 
         /**
          * ファイル入力フィールドをクリアし、新しい要素への参照を返すヘルパー関数
-         * ファイル入力のセキュリティ制約を回避するため、要素の複製でリセットする
+         * 古い要素の位置を維持しながら新しい要素に置き換えます。
          * @param {HTMLElement} inputElement - クリアしたい <input type="file"> 要素
          * @returns {HTMLElement} 新しい <input type="file"> 要素
          */
         function resetFileInput(inputElement) {
             const parent = inputElement.parentNode;
+            const nextSibling = inputElement.nextSibling;
             const newElement = inputElement.cloneNode(true);
+            
+            // イベントリスナーを再度設定するために古い要素を削除
+            inputElement.removeEventListener('change', null); // 念のため
             inputElement.remove();
-            parent.appendChild(newElement);
+            
+            // 古い要素があった場所に戻す
+            if (nextSibling) {
+                parent.insertBefore(newElement, nextSibling);
+            } else {
+                parent.appendChild(newElement);
+            }
+            
+            // 新しい要素を返す
             return newElement;
         }
 
         // 賞品追加
         document.getElementById('addPrize').addEventListener('click', () => {
-            const file = prizeImgInput.files[0]; // 修正: 現在の参照を使う
+            const file = prizeImgInput.files[0];
             const name = document.getElementById('prizeName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -504,7 +522,7 @@
 
         // メンバー追加
         document.getElementById('addMember').addEventListener('click', () => {
-            const file = memberImgInput.files[0]; // 修正: 現在の参照を使う
+            const file = memberImgInput.files[0];
             const name = document.getElementById('memberName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -546,7 +564,6 @@
             const deleteCancel = element.querySelector('.delete-cancel');
             
             const startTimer = () => {
-                // すでにオーバーレイが表示されていたらタイマーを起動しない
                 if (overlay.classList.contains('show')) return; 
                 timer = setTimeout(() => {
                     overlay.classList.add('show');
@@ -570,10 +587,9 @@
             // 削除確認ボタン: システムメニューなしで直接削除
             deleteConfirm.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // 削除処理を実行
                 if (type === 'prize') deletePrize(index);
                 else if (type === 'member') deleteMember(index);
-                overlay.classList.remove('show'); // オーバーレイを消す
+                overlay.classList.remove('show');
             });
             
             // キャンセルボタン
@@ -584,9 +600,8 @@
             
             // カード自体をクリックした場合は、削除オーバーレイを隠す（通常のクリックと区別）
             element.addEventListener('click', (e) => {
-                // 削除オーバーレイが表示されていない場合のみ通常のクリックとして扱う
                 if(!overlay.classList.contains('show')){
-                    clearTimer(); // 短いクリックはタイマーをクリア
+                    clearTimer();
                 }
                 overlay.classList.remove('show');
             });
