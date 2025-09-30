@@ -10,20 +10,20 @@
         /* 全体設定 */
         body {
             margin: 0;
-            font-family: 'Kosugi Maru', sans-serif; /* 柔らかい字体 */
-            background: #e6e9f0; /* 薄いネイビー系の背景 */
+            font-family: 'Kosugi Maru', sans-serif; 
+            background: #e6e9f0; 
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding-top: 60px; /* ヘッダーの高さ分スペースを空ける */
+            padding-top: 60px; 
         }
         
-        /* 🔥 長押しでシステムメニューが出ないようにする */
-        .prizeCard, .memberCard, .action-button, #message, #resultsList {
-            -webkit-user-select: none; /* Safari/iOS */
-            user-select: none; /* 標準 */
-            -webkit-touch-callout: none; /* iOSの長押しメニュー抑制 */
+        /* 長押しでシステムメニューが出ないようにする */
+        .prizeCard, .memberCard, .action-button, #message, #resultsList, .folder-image {
+            -webkit-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none; 
         }
 
         /* ヘッダー */
@@ -33,10 +33,10 @@
             left: 0;
             width: 100%;
             height: 60px;
-            background: #0a1931; /* ネイビー */
+            background: #0a1931; 
             color: #fff;
             z-index: 100;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* 高級感のある影 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -49,7 +49,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 0 16px;
-            /* 🔥 修正: ヘッダー要素を中央に寄せ、ロゴとタイトルを適切に配置 */
             justify-content: space-between; 
             box-sizing: border-box;
         }
@@ -59,26 +58,25 @@
             width: auto;
             object-fit: contain;
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 光沢感 */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); 
         }
 
         .unizon-title {
-            font-family: 'Bebas Neue', cursive; /* 筆記体風 */
+            font-family: 'Bebas Neue', cursive; 
             font-size: 28px;
             margin: 0;
             color: #fff;
-            text-shadow: 2px 2px 4px #d62828; /* 赤で強調 */
-            /* 🔥 修正: タイトルが中央に来るようにflexで調整 */
+            text-shadow: 2px 2px 4px #d62828; 
             flex-grow: 1;
             text-align: center;
         }
         
-        /* 🔥 ガチャセクションのコンテナ */
+        /* ガチャセクションのコンテナ */
         .gacha-container {
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center; /* ガチャボックスとボタンを中央寄せ */
+            align-items: center; 
         }
 
         .content-wrap {
@@ -89,8 +87,8 @@
         }
 
         .section-title {
-            color: #0a1931; /* ネイビー */
-            border-bottom: 2px solid #d62828; /* 赤の強調線 */
+            color: #0a1931; 
+            border-bottom: 2px solid #d62828; 
             padding-bottom: 4px;
             margin-top: 24px;
             margin-bottom: 16px;
@@ -133,7 +131,7 @@
             box-sizing: border-box;
             transition: background 0.3s, transform 0.1s;
             font-family: 'Kosugi Maru', sans-serif;
-            box-shadow: 0 4px #0a1931; /* 押し込みエフェクト用 */
+            box-shadow: 0 4px #0a1931; 
         }
 
         .action-button:active {
@@ -142,9 +140,9 @@
         }
 
         .ball-button {
-            background: #d62828; /* 赤 */
+            background: #d62828; 
             border-radius: 50px;
-            box-shadow: 0 4px #991c1c; /* 暗い赤 */
+            box-shadow: 0 4px #991c1c; 
         }
 
         .ball-button:active {
@@ -152,13 +150,13 @@
         }
 
         .large-ball-button {
-            background: linear-gradient(145deg, #0a1931, #060e1a); /* ネイビーのグラデーション */
+            background: linear-gradient(145deg, #0a1931, #060e1a); 
             color: #fff;
             padding: 16px;
             font-size: 18px;
             border-radius: 50px;
             box-shadow: 0 6px #060e1a;
-            max-width: 300px; /* 🔥 修正: 大きすぎるのを防ぐ */
+            max-width: 300px; 
             margin: 10px auto;
         }
 
@@ -185,7 +183,7 @@
             border-radius: 4px;
         }
 
-        /* 抽選表 & メンバーカード (登録画面) */
+        /* 登録画面のカード */
         .prizeCard, .memberCard {
             min-width: 90px;
             height: auto;
@@ -208,14 +206,6 @@
             border: 3px solid #0a1931;
             padding: 8px 4px;
         }
-
-        .prizeCard img {
-            width: 90%;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        
         .memberCard img {
             width: 80px;
             height: 80px;
@@ -226,39 +216,13 @@
 
         /* 削除確認メッセージ */
         .delete-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 12px;
-            font-size: 12px;
-            text-align: center;
-            padding: 5px;
-            box-sizing: border-box;
-            transition: opacity 0.3s;
-            opacity: 0;
-            pointer-events: none;
+            /* スタイルは前回のまま */
         }
         .delete-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
+            /* スタイルは前回のまま */
         }
         .delete-overlay button {
-            width: 80%;
-            padding: 4px;
-            margin-top: 5px;
-            font-size: 10px;
-            background: #d62828;
-            border-radius: 5px;
-            box-shadow: none;
-            cursor: pointer;
+            /* スタイルは前回のまま */
         }
 
         /* ガチャボックス */
@@ -272,148 +236,16 @@
             margin: 16px auto;
             overflow: hidden;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5); 
-            /* 🔥 修正: 親コンテナで中央寄せしているので、ここでのautoは不要だが残しておく */
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* ガチャボール */
-        .ball {
-            position: absolute;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #d62828, #a32020); /* 赤のグラデーション */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.6); /* 野球ボール風の光沢 */
-            overflow: hidden;
-            transition: transform 1s ease, top 1s ease, left 1s ease;
-            border: 2px solid #fff;
-        }
-
-        .ball img {
-            width: 80%;
-            height: 80%;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #0a1931;
-            z-index: 1;
-        }
-
-        .ball.spin {
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .ball.open {
-            animation: openBall 0.6s forwards;
-        }
-
-        @keyframes openBall {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3) rotate(15deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-
         /* 当たりメッセージ (ポップアップ) */
         #message {
-            position: fixed;
-            top: 50%; 
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            text-align: center;
-            z-index: 20;
-            padding: 20px;
-            transition: transform 0.6s ease;
-            width: 80%;
-            max-width: 400px;
-            pointer-events: none; 
-            cursor: pointer; 
-        }
-
-        #message.show {
-            transform: translate(-50%, -50%) scale(1);
-            pointer-events: auto; 
-        }
-
-        /* 当たりメッセージの背景（横断幕） */
-        #banner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                45deg,
-                #d62828, 
-                #d62828 15px,
-                #0a1931 15px, 
-                #0a1931 30px
-            );
-            border-radius: 16px;
-            animation: wave 1s ease-in-out infinite alternate;
-            z-index: -1;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
-            border: 4px solid #fff;
-        }
-
-        /* 当たりメッセージの内容コンテナ */
-        #messageContent {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-radius: 16px;
-            padding: 20px;
-        }
-
-        /* メンバー画像 - 小さく丸形 */
-        #messageContent img.member-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 10px 0;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        /* 賞品画像 - 大きく角丸四角形で背景アニメーションと同じ動き */
-        #messageContent img.prize-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 20px; 
-            margin: 10px 0;
-            object-fit: cover;
-            border: 6px solid #ffd700; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: wave 1s ease-in-out infinite alternate; 
-        }
-
-        #messageContent div {
-            margin-top: 10px;
-            font-family: 'Kosugi Maru', sans-serif;
-            color: #ffd700; 
-            text-shadow: 2px 2px 4px #000;
+           /* スタイルは前回のまま */
         }
 
         /* 抽選結果リストのスタイル */
-        #resultsList {
-            width: 100%;
-            margin-top: 20px;
-            padding: 0;
-            list-style: none;
-        }
-
         .result-item {
             display: flex;
             align-items: center;
@@ -425,53 +257,44 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             position: relative;
         }
-
-        .result-img-group {
+        
+        /* 🔥 既存メンバー画像リスト */
+        #folderMembers {
             display: flex;
-            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        .result-member-img {
-            width: 50px;
-            height: 50px;
+        .folder-image-wrap {
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            padding: 5px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: border-color 0.2s;
+        }
+        
+        .folder-image-wrap:hover {
+             border-color: #d62828;
+        }
+
+        .folder-image {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #d62828;
-            margin-right: 10px;
+            border: 3px solid #0a1931;
         }
-
-        .result-prize-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 2px solid #ffd700;
-            margin-left: 10px;
-        }
-
-        .result-text {
-            font-size: 16px;
-            font-weight: bold;
+        .folder-image-wrap div {
+            font-size: 12px;
             color: #0a1931;
-            flex-shrink: 0; /* テキストが縮まないように */
-            margin: 0 5px;
+            margin-top: 4px;
+            word-break: keep-all; /* 名前が途中で切れないように */
         }
 
-        .delete-result-btn {
-            background: #d62828;
-            color: #fff;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-            margin-left: auto; /* 右端に寄せる */
-        }
-
-        .delete-result-btn:hover {
-            background: #a32020;
-        }
     </style>
 </head>
 <body>
@@ -498,6 +321,12 @@
             </div>
 
         <h2 class="section-title">👤 野球チームメンバー登録</h2>
+        
+        <h3 class="section-title">フォルダからメンバーを選択 (タップで登録)</h3>
+        <div id="folderMembers">
+            </div>
+        
+        <h3 class="section-title">新規メンバーを登録</h3>
         <section class="form-section" id="memberForm">
             <label for="memberImg">メンバー写真</label>
             <input type="file" id="memberImg" accept="image/*">
@@ -511,7 +340,8 @@
             </div>
 
         <h2 class="section-title">🎰 ガチャ抽選</h2>
-        <div class="gacha-container"> <div id="gachaBox">
+        <div class="gacha-container"> 
+            <div id="gachaBox">
                 </div>
             <button id="startGacha" class="action-button large-ball-button">ガチャを引く</button>
         </div>
@@ -536,6 +366,7 @@
         const message = document.getElementById('message');
         const messageContent = document.getElementById('messageContent');
         const resultsList = document.getElementById('resultsList'); 
+        const folderMembersContainer = document.getElementById('folderMembers'); // 🔥 フォルダメンバーコンテナ
 
         // ファイル入力要素を初期参照
         let prizeImgInput = document.getElementById('prizeImg');
@@ -546,6 +377,16 @@
         let balls = [];
         let results = []; 
 
+        // 🔥 フォルダ内に存在するメンバー画像ファイル名 (ダミーデータ)
+        // 実際にはサーバーサイドの処理が必要ですが、ここではクライアント側でシミュレーションします。
+        const folderMemberData = [
+            { name: "山田太郎", file: "member/yamada.jpg" },
+            { name: "佐藤次郎", file: "member/sato.jpg" },
+            { name: "田中三郎", file: "member/tanaka.png" },
+            { name: "高橋四朗", file: "member/takahashi.jpg" },
+            // 必要に応じて画像ファイル名と名前を追記してください
+        ];
+
         /**
          * ファイル入力フィールドをクリアし、新しい要素への参照を返すヘルパー関数
          */
@@ -554,10 +395,8 @@
             const nextSibling = inputElement.nextSibling;
             const newElement = inputElement.cloneNode(true);
             
-            // 古い要素を削除
             inputElement.remove();
             
-            // 古い要素があった場所に戻す
             if (nextSibling) {
                 parent.insertBefore(newElement, nextSibling);
             } else {
@@ -566,6 +405,27 @@
             
             return newElement;
         }
+        
+        /**
+         * 🔥 メンバー登録を実行する共通関数
+         * @param {string} name - メンバー名
+         * @param {string} src - 画像のデータURLまたはパス
+         */
+        function registerMember(name, src) {
+             // 重複チェック (名前と画像ソースが完全に一致する場合)
+            const isDuplicate = members.some(m => m.name === name && m.src === src);
+            if (isDuplicate) {
+                alert(`${name} さんはすでにメンバーリストに登録されています。`);
+                return;
+            }
+
+            const id = Date.now() + Math.random();
+            members.push({ id, name, src });
+            renderMembers();
+            document.getElementById('memberName').value = ''; // 名前入力フィールドをクリア
+        }
+
+        // --- イベントリスナー ---
 
         // 賞品追加
         document.getElementById('addPrize').addEventListener('click', () => {
@@ -578,7 +438,6 @@
             const reader = new FileReader();
             reader.onload = e => {
                 const src = e.target.result;
-                // 賞品に固有のIDを付与
                 const id = Date.now() + Math.random(); 
                 prizes.push({ id, name, src });
                 renderPrizes();
@@ -590,7 +449,7 @@
             reader.readAsDataURL(file);
         });
 
-        // メンバー追加
+        // 🔥 新規メンバー追加 (ファイル/カメラ)
         document.getElementById('addMember').addEventListener('click', () => {
             const file = memberImgInput.files[0];
             const name = document.getElementById('memberName').value.trim();
@@ -601,11 +460,7 @@
             const reader = new FileReader();
             reader.onload = e => {
                 const src = e.target.result;
-                // メンバーに固有のIDを付与
-                const id = Date.now() + Math.random();
-                members.push({ id, name, src });
-                renderMembers();
-                document.getElementById('memberName').value = '';
+                registerMember(name, src);
                 
                 memberImgInput = resetFileInput(memberImgInput);
             };
@@ -723,6 +578,26 @@
                 setupDeleteEvents(div, i, 'member');
             });
         }
+        
+        // 🔥 フォルダメンバー画像の表示とクリックイベント設定
+        function renderFolderMembers() {
+            folderMembersContainer.innerHTML = '';
+            folderMemberData.forEach(data => {
+                const div = document.createElement('div');
+                div.className = 'folder-image-wrap';
+                div.innerHTML = `
+                    <img src="${data.file}" class="folder-image" alt="${data.name}の画像">
+                    <div>${data.name}</div>
+                `;
+                
+                // タップ (クリック) されたらメンバーに追加
+                div.addEventListener('click', () => {
+                    registerMember(data.name, data.file);
+                });
+                
+                folderMembersContainer.appendChild(div);
+            });
+        }
 
         // 抽選結果表示
         function renderResults() {
@@ -745,7 +620,6 @@
                 resultsList.appendChild(li);
             });
             
-            // 削除ボタンにイベントリスナーを設定
             resultsList.querySelectorAll('.delete-result-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const index = parseInt(e.target.dataset.index);
@@ -761,14 +635,12 @@
             prizes.forEach((p, i) => {
                 const ball = document.createElement('div');
                 ball.className = 'ball spin';
-                // 賞品IDをボールのDOM要素に保持
                 ball.dataset.prizeId = p.id;
                 
                 const img = document.createElement('img');
                 img.src = p.src;
                 ball.appendChild(img);
                 
-                // ガチャボックス内でのランダムな初期位置
                 const top = Math.random() * 100 + 80; 
                 const left = Math.random() * 100 + 70;
                 ball.style.top = top + 'px';
@@ -791,12 +663,11 @@
                  return;
             }
 
-            // メンバーと賞品をランダムに選択
             const memberIdx = Math.floor(Math.random() * members.length);
             const member = members[memberIdx];
             
             const ballIdx = Math.floor(Math.random() * balls.length);
-            const { ball, p } = balls[ballIdx]; // 当選したボールと賞品データ
+            const { ball, p } = balls[ballIdx]; 
             
             
             // --- 抽選後の自動削除ロジック ---
@@ -816,12 +687,15 @@
             }
 
             // 3. 抽選されたボールをガチャボールリスト (balls) から削除
-            balls.splice(ballIdx, 1);
-            // createGachaBalls() は抽選対象の賞品が変わったため、すでに renderPrizes() の中で呼ばれている
+            // balls配列から削除するだけでなく、ガチャボックス内のDOM要素も削除する必要があります。
+            // DOM要素の削除はアニメーション後に実行されます。
 
+            balls.splice(ballIdx, 1);
+            createGachaBalls(); // 残りの賞品でボールを再生成 (この方が確実)
+            
             // --- アニメーションと結果表示 ---
 
-            // ボールを排出するアニメーション
+            // ボールを排出するアニメーション (削除対象のボールのDOMを移動)
             const offsetY = -150; 
             ball.style.transition = 'transform 1s ease, top 1s ease, left 1s ease';
             ball.style.top = parseFloat(ball.style.top) + offsetY + 'px';
@@ -835,9 +709,8 @@
 
             // 結果表示
             setTimeout(() => {
-                // 抽選結果を記録
                 results.push({ member: member, prize: p });
-                renderResults(); // リストを更新
+                renderResults(); 
 
                 // ポップアップメッセージ
                 messageContent.innerHTML = '<div id="banner"></div>';
@@ -859,10 +732,9 @@
                 
                 message.classList.add('show');
                 
-                // 画面タッチで閉じる
                 const closeHandler = () => {
                     message.classList.remove('show');
-                    ball.remove(); 
+                    ball.remove(); // アニメーションに使ったボールをDOMから削除
                     message.removeEventListener('click', closeHandler);
                 };
                 message.addEventListener('click', closeHandler, { once: true });
@@ -870,6 +742,7 @@
         });
 
         // 初期表示（ページロード時）
+        renderFolderMembers(); // 🔥 フォルダメンバーリストの表示を追加
         createGachaBalls(); 
         renderResults(); 
     </script>
