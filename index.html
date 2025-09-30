@@ -456,8 +456,10 @@
         const startGacha = document.getElementById('startGacha');
         const message = document.getElementById('message');
         const messageContent = document.getElementById('messageContent');
-        const prizeImgInput = document.getElementById('prizeImg');
-        const memberImgInput = document.getElementById('memberImg');
+        
+        // ファイル入力要素を初期参照
+        let prizeImgInput = document.getElementById('prizeImg');
+        let memberImgInput = document.getElementById('memberImg');
 
         let prizes = [];
         let members = [];
@@ -465,9 +467,10 @@
         let touchStartTimer = null; // 長押し判定用タイマー
 
         /**
-         * ファイル入力フィールドをクリアするヘルパー関数
+         * ファイル入力フィールドをクリアし、新しい要素への参照を返すヘルパー関数
          * ファイル入力のセキュリティ制約を回避するため、要素の複製でリセットする
          * @param {HTMLElement} inputElement - クリアしたい <input type="file"> 要素
+         * @returns {HTMLElement} 新しい <input type="file"> 要素
          */
         function resetFileInput(inputElement) {
             const parent = inputElement.parentNode;
@@ -479,7 +482,7 @@
 
         // 賞品追加
         document.getElementById('addPrize').addEventListener('click', () => {
-            const file = prizeImgInput.files[0];
+            const file = prizeImgInput.files[0]; // 修正: 現在の参照を使う
             const name = document.getElementById('prizeName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -492,15 +495,16 @@
                 renderPrizes();
                 createGachaBalls();
                 document.getElementById('prizeName').value = '';
-                // 修正: ファイル入力をリセット
-                resetFileInput(document.getElementById('prizeImg')); 
+                
+                // 修正: ファイル入力をリセットし、参照を更新
+                prizeImgInput = resetFileInput(prizeImgInput); 
             };
             reader.readAsDataURL(file);
         });
 
         // メンバー追加
         document.getElementById('addMember').addEventListener('click', () => {
-            const file = memberImgInput.files[0];
+            const file = memberImgInput.files[0]; // 修正: 現在の参照を使う
             const name = document.getElementById('memberName').value.trim();
             if (!file || !name) {
                 alert('写真と名前を入力してください。');
@@ -512,8 +516,9 @@
                 members.push({ name, src });
                 renderMembers();
                 document.getElementById('memberName').value = '';
-                // 修正: ファイル入力をリセット
-                resetFileInput(document.getElementById('memberImg'));
+                
+                // 修正: ファイル入力をリセットし、参照を更新
+                memberImgInput = resetFileInput(memberImgInput);
             };
             reader.readAsDataURL(file);
         });
@@ -522,19 +527,15 @@
 
         // 賞品削除関数
         function deletePrize(index) {
-            if (confirm(`${prizes[index].name}を削除しますか？`)) {
-                prizes.splice(index, 1);
-                renderPrizes();
-                createGachaBalls();
-            }
+            prizes.splice(index, 1);
+            renderPrizes();
+            createGachaBalls();
         }
 
         // メンバー削除関数
         function deleteMember(index) {
-            if (confirm(`${members[index].name}さんを削除しますか？`)) {
-                members.splice(index, 1);
-                renderMembers();
-            }
+            members.splice(index, 1);
+            renderMembers();
         }
 
         // 長押しイベントリスナーの設定
@@ -566,11 +567,13 @@
             element.addEventListener('touchend', clearTimer);
             element.addEventListener('touchmove', clearTimer);
             
-            // 削除確認ボタン
+            // 削除確認ボタン: システムメニューなしで直接削除
             deleteConfirm.addEventListener('click', (e) => {
                 e.stopPropagation();
+                // 削除処理を実行
                 if (type === 'prize') deletePrize(index);
                 else if (type === 'member') deleteMember(index);
+                overlay.classList.remove('show'); // オーバーレイを消す
             });
             
             // キャンセルボタン
@@ -601,7 +604,7 @@
                     <img src="${p.src}">
                     <div>${p.name}</div>
                     <div class="delete-overlay">
-                        削除しますか？<br>
+                        **${p.name}** を<br>削除しますか？<br>
                         <button class="delete-confirm">はい</button>
                         <button class="delete-cancel">いいえ</button>
                     </div>
@@ -621,7 +624,7 @@
                     <img src="${m.src}">
                     <div>${m.name}</div>
                     <div class="delete-overlay">
-                        削除しますか？<br>
+                        **${m.name}** さんを<br>削除しますか？<br>
                         <button class="delete-confirm">はい</button>
                         <button class="delete-cancel">いいえ</button>
                     </div>
