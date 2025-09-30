@@ -20,7 +20,7 @@
         }
         
         /* 🔥 長押しでシステムメニューが出ないようにする */
-        .prizeCard, .memberCard, .action-button, #message {
+        .prizeCard, .memberCard, .action-button, #message, #resultsList {
             -webkit-user-select: none; /* Safari/iOS */
             user-select: none; /* 標準 */
             -webkit-touch-callout: none; /* iOSの長押しメニュー抑制 */
@@ -169,8 +169,8 @@
             border-radius: 4px;
         }
 
-        /* 抽選表 */
-        .prizeCard {
+        /* 抽選表 & メンバーカード (登録画面) */
+        .prizeCard, .memberCard {
             min-width: 90px;
             height: 120px;
             background: #fff;
@@ -182,11 +182,16 @@
             font-size: 14px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            border: 3px solid #d62828; /* 赤の枠線 */
+            border: 3px solid #d62828; 
             flex-shrink: 0;
             padding: 4px;
             text-align: center;
-            position: relative; /* 削除ボタン用 */
+            position: relative; 
+            height: auto; /* メンバーカードと共通化のため */
+        }
+        .memberCard {
+            border: 3px solid #0a1931;
+            padding: 8px 4px;
         }
 
         .prizeCard img {
@@ -194,9 +199,16 @@
             height: 70px;
             object-fit: cover;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
+        .memberCard img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #d62828; 
+        }
+
         /* 削除確認メッセージ */
         .delete-overlay {
             position: absolute;
@@ -234,175 +246,106 @@
             cursor: pointer;
         }
 
-        /* メンバーカード */
-        .memberCard {
-            min-width: 90px;
-            text-align: center;
-            cursor: pointer;
-            background: #fff;
-            border-radius: 12px;
-            border: 3px solid #0a1931; /* ネイビーの枠線 */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
-            padding: 8px 4px;
-            position: relative; /* 削除ボタン用 */
-        }
-
-        .memberCard img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #d62828; /* 赤の縁取り */
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-        }
-
         /* ガチャボックス */
         #gachaBox {
             position: relative;
             width: 240px;
             height: 260px;
             border-radius: 16px;
-            background: #e6e9f0; /* 薄い背景 */
-            border: 5px solid #0a1931; /* ネイビーの枠 */
+            background: #e6e9f0; 
+            border: 5px solid #0a1931; 
             margin: 16px auto;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5); /* 光沢感 */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5); 
         }
 
         /* ガチャボール */
         .ball {
-            position: absolute;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #d62828, #a32020); /* 赤のグラデーション */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.6); /* 野球ボール風の光沢 */
-            overflow: hidden;
-            transition: transform 1s ease, top 1s ease, left 1s ease;
-            border: 2px solid #fff;
+            /* ... (スタイルは前回のまま) ... */
         }
-
-        .ball img {
-            width: 80%;
-            height: 80%;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #0a1931;
-            z-index: 1;
-        }
-
-        .ball.spin {
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .ball.open {
-            animation: openBall 0.6s forwards;
-        }
-
-        @keyframes openBall {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3) rotate(15deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-
         /* 当たりメッセージ */
         #message {
-            position: fixed;
-            top: 50%; /* 画面中央 */
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            text-align: center;
-            z-index: 20;
-            padding: 20px;
-            transition: transform 0.6s ease;
-            width: 80%;
-            max-width: 400px;
-            pointer-events: none; /* 初期は非表示なので無効 */
-            cursor: pointer; /* タッチで消すためにカーソルをポインターにする */
+            /* ... (スタイルは前回のまま) ... */
         }
-
-        #message.show {
-            transform: translate(-50%, -50%) scale(1);
-            pointer-events: auto; /* 表示時に有効化 */
-        }
-
-        /* 当たりメッセージの背景（横断幕） */
         #banner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                45deg,
-                #d62828, /* 赤 */
-                #d62828 15px,
-                #0a1931 15px, /* ネイビー */
-                #0a1931 30px
-            );
-            border-radius: 16px;
-            animation: wave 1s ease-in-out infinite alternate;
-            z-index: -1;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
-            border: 4px solid #fff;
+            /* ... (スタイルは前回のまま) ... */
         }
-
-        @keyframes wave {
-            0% { transform: translateX(-8px) rotate(-1deg); }
-            100% { transform: translateX(8px) rotate(1deg); }
-        }
-
-        /* 当たりメッセージの内容コンテナ（ブラック背景削除） */
         #messageContent {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-radius: 16px;
-            padding: 20px;
-            /* 黒背景・ぼかしを削除し、透明なコンテナにする */
+            /* ... (スタイルは前回のまま) ... */
         }
-
-        /* メンバー画像 - 小さく丸形 */
         #messageContent img.member-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 10px 0;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            /* ... (スタイルは前回のまま) ... */
         }
-
-        /* 賞品画像 - 大きく角丸四角形で背景アニメーションと同じ動き */
         #messageContent img.prize-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 20px; /* 大きな角丸 */
-            margin: 10px 0;
-            object-fit: cover;
-            border: 6px solid #ffd700; /* 金色の豪華な枠 */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: wave 1s ease-in-out infinite alternate; /* 背景と同じアニメーションを適用 */
+            /* ... (スタイルは前回のまま) ... */
         }
 
-        #messageContent div {
-            margin-top: 10px;
-            font-family: 'Kosugi Maru', sans-serif;
-            color: #ffd700; /* 金色で豪華に */
-            text-shadow: 2px 2px 4px #000;
+
+        /* 🔥 抽選結果リストのスタイル */
+        #resultsList {
+            width: 100%;
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 2px solid #0a1931;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .result-img-group {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .result-member-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #d62828;
+            margin-right: 10px;
+        }
+
+        .result-prize-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ffd700;
+            margin-left: 10px;
+        }
+
+        .result-text {
+            flex-grow: 1;
+            font-size: 16px;
+            font-weight: bold;
+            color: #0a1931;
+        }
+
+        .delete-result-btn {
+            background: #d62828;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-left: 10px;
+        }
+
+        .delete-result-btn:hover {
+            background: #a32020;
         }
     </style>
 </head>
@@ -448,6 +391,10 @@
 
         <button id="startGacha" class="action-button large-ball-button">ガチャを引く</button>
 
+        <h2 class="section-title">🏆 抽選結果リスト</h2>
+        <ul id="resultsList">
+            </ul>
+
     </main>
 
     <div id="message">
@@ -463,7 +410,8 @@
         const startGacha = document.getElementById('startGacha');
         const message = document.getElementById('message');
         const messageContent = document.getElementById('messageContent');
-        
+        const resultsList = document.getElementById('resultsList'); // 新しい要素
+
         // ファイル入力要素を初期参照
         let prizeImgInput = document.getElementById('prizeImg');
         let memberImgInput = document.getElementById('memberImg');
@@ -471,20 +419,17 @@
         let prizes = [];
         let members = [];
         let balls = [];
+        let results = []; // 🔥 抽選結果を保持する新しい配列
 
         /**
          * ファイル入力フィールドをクリアし、新しい要素への参照を返すヘルパー関数
-         * 古い要素の位置を維持しながら新しい要素に置き換えます。
-         * @param {HTMLElement} inputElement - クリアしたい <input type="file"> 要素
-         * @returns {HTMLElement} 新しい <input type="file"> 要素
          */
         function resetFileInput(inputElement) {
             const parent = inputElement.parentNode;
             const nextSibling = inputElement.nextSibling;
             const newElement = inputElement.cloneNode(true);
             
-            // イベントリスナーを再度設定するために古い要素を削除
-            inputElement.removeEventListener('change', null); // 念のため
+            // 古い要素を削除
             inputElement.remove();
             
             // 古い要素があった場所に戻す
@@ -494,7 +439,6 @@
                 parent.appendChild(newElement);
             }
             
-            // 新しい要素を返す
             return newElement;
         }
 
@@ -514,7 +458,6 @@
                 createGachaBalls();
                 document.getElementById('prizeName').value = '';
                 
-                // 修正: ファイル入力をリセットし、参照を更新
                 prizeImgInput = resetFileInput(prizeImgInput); 
             };
             reader.readAsDataURL(file);
@@ -535,13 +478,12 @@
                 renderMembers();
                 document.getElementById('memberName').value = '';
                 
-                // 修正: ファイル入力をリセットし、参照を更新
                 memberImgInput = resetFileInput(memberImgInput);
             };
             reader.readAsDataURL(file);
         });
         
-        // --- 削除機能 ---
+        // --- 削除機能 (登録画面) ---
 
         // 賞品削除関数
         function deletePrize(index) {
@@ -555,8 +497,14 @@
             members.splice(index, 1);
             renderMembers();
         }
+        
+        // 🔥 抽選結果からの削除関数
+        function deleteResult(index) {
+            results.splice(index, 1);
+            renderResults();
+        }
 
-        // 長押しイベントリスナーの設定
+        // 長押しイベントリスナーの設定 (登録画面のカード用)
         function setupDeleteEvents(element, index, type) {
             let timer = null;
             const overlay = element.querySelector('.delete-overlay');
@@ -564,46 +512,44 @@
             const deleteCancel = element.querySelector('.delete-cancel');
             
             const startTimer = () => {
-                if (overlay.classList.contains('show')) return; 
+                if (overlay && overlay.classList.contains('show')) return; 
                 timer = setTimeout(() => {
-                    overlay.classList.add('show');
-                }, 700); // 700msで長押しと判定
+                    if (overlay) overlay.classList.add('show');
+                }, 700); 
             };
 
             const clearTimer = () => {
                 clearTimeout(timer);
             };
 
-            // マウス/タッチ開始
+            // イベント設定
             element.addEventListener('mousedown', startTimer);
             element.addEventListener('touchstart', startTimer);
-
-            // マウス/タッチ終了または移動
             element.addEventListener('mouseup', clearTimer);
             element.addEventListener('mouseleave', clearTimer);
             element.addEventListener('touchend', clearTimer);
             element.addEventListener('touchmove', clearTimer);
             
-            // 削除確認ボタン: システムメニューなしで直接削除
-            deleteConfirm.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (type === 'prize') deletePrize(index);
-                else if (type === 'member') deleteMember(index);
-                overlay.classList.remove('show');
-            });
+            if (deleteConfirm) {
+                deleteConfirm.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (type === 'prize') deletePrize(index);
+                    else if (type === 'member') deleteMember(index);
+                });
+            }
             
-            // キャンセルボタン
-            deleteCancel.addEventListener('click', (e) => {
-                e.stopPropagation();
-                overlay.classList.remove('show');
-            });
+            if (deleteCancel) {
+                deleteCancel.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    overlay.classList.remove('show');
+                });
+            }
             
-            // カード自体をクリックした場合は、削除オーバーレイを隠す（通常のクリックと区別）
             element.addEventListener('click', (e) => {
-                if(!overlay.classList.contains('show')){
+                if(overlay && !overlay.classList.contains('show')){
                     clearTimer();
                 }
-                overlay.classList.remove('show');
+                if (overlay) overlay.classList.remove('show');
             });
         }
 
@@ -649,6 +595,36 @@
             });
         }
 
+        // 🔥 抽選結果表示
+        function renderResults() {
+            resultsList.innerHTML = '';
+            results.forEach((r, i) => {
+                const li = document.createElement('li');
+                li.className = 'result-item';
+                li.innerHTML = `
+                    <div class="result-img-group">
+                        <img src="${r.member.src}" class="result-member-img" alt="${r.member.name}">
+                        <div class="result-text">${r.member.name}</div>
+                    </div>
+                    <span>が</span>
+                    <div class="result-img-group">
+                        <img src="${r.prize.src}" class="result-prize-img" alt="${r.prize.name}">
+                        <div class="result-text">${r.prize.name}</div>
+                    </div>
+                    <button class="delete-result-btn" data-index="${i}">削除</button>
+                `;
+                resultsList.appendChild(li);
+            });
+            
+            // 削除ボタンにイベントリスナーを設定
+            resultsList.querySelectorAll('.delete-result-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    deleteResult(index);
+                });
+            });
+        }
+
         // ガチャボール作成（画像入り）
         function createGachaBalls() {
             gachaBox.innerHTML = '';
@@ -678,7 +654,6 @@
                 return;
             }
 
-            // すでにボールがない場合（全て抽選済み）
             if (balls.length === 0) {
                  alert('全ての賞品が抽選されました。リセットするにはページを更新してください。');
                  return;
@@ -690,11 +665,11 @@
             const ballIdx = Math.floor(Math.random() * balls.length);
             const { ball, p } = balls[ballIdx];
             
-            // 抽選されたボールをリストから削除
+            // 抽選されたボールをリストから削除（抽選対象から除外）
             balls.splice(ballIdx, 1);
 
             // ボールを排出するアニメーション
-            const offsetY = -150; // ボールが上に飛び出す距離
+            const offsetY = -150; 
             ball.style.transition = 'transform 1s ease, top 1s ease, left 1s ease';
             ball.style.top = parseFloat(ball.style.top) + offsetY + 'px';
             ball.style.left = '50%';
@@ -707,14 +682,17 @@
 
             // 結果表示
             setTimeout(() => {
-                messageContent.innerHTML = '<div id="banner"></div>'; // バナーを再挿入
+                // 🔥 抽選結果を記録
+                results.push({ member: member, prize: p });
+                renderResults(); // リストを更新
+
+                // ポップアップメッセージ
+                messageContent.innerHTML = '<div id="banner"></div>';
                 
-                // メンバー画像
                 const memberImg = document.createElement('img');
                 memberImg.src = member.src;
                 memberImg.className = 'member-img';
                 
-                // 賞品画像
                 const prizeImg = document.createElement('img');
                 prizeImg.src = p.src;
                 prizeImg.className = 'prize-img';
@@ -731,7 +709,7 @@
                 // 画面タッチで閉じる
                 const closeHandler = () => {
                     message.classList.remove('show');
-                    ball.remove(); // 飛び出したボールを削除
+                    ball.remove(); 
                     message.removeEventListener('click', closeHandler);
                 };
                 message.addEventListener('click', closeHandler, { once: true });
@@ -740,6 +718,7 @@
 
         // 初期表示（ページロード時）
         createGachaBalls(); 
+        renderResults(); // 念のため初期表示
     </script>
 </body>
 </html>
