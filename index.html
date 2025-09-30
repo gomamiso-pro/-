@@ -19,18 +19,20 @@ body{
 /* 入力フォーム */
 section{margin-bottom:16px;width:100%;max-width:360px;}
 label{display:block;margin-bottom:4px;font-weight:bold;}
-input,textarea,button{width:100%;margin-bottom:6px;padding:8px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;}
+input,button{width:100%;margin-bottom:6px;padding:8px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;}
 button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 
-/* 抽選表 */
-#prizeTable{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+/* 横スクロール */
+.scrollContainer{
+  display:flex;
   gap:8px;
-  margin-bottom:16px;
+  overflow-x:auto;
+  padding-bottom:8px;
 }
+
+/* 抽選表 */
 .prizeCard{
-  width:80px;
+  min-width:80px;
   height:80px;
   background:#fff0e5;
   border-radius:12px;
@@ -42,24 +44,20 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   box-shadow:0 4px 8px rgba(0,0,0,0.3);
   overflow:hidden;
   border:2px solid #8b5e3c;
+  flex-shrink:0;
 }
 .prizeCard img{width:100%;height:50px;object-fit:cover;border-radius:6px;}
 
 /* メンバーカード */
-#memberStage{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
-  gap:8px;
-  margin-bottom:16px;
-}
 .memberCard{
-  width:80px;
+  min-width:80px;
   text-align:center;
   cursor:pointer;
   background:#fff4e0;
   border-radius:12px;
   border:2px solid #d2691e;
   box-shadow:0 3px 6px rgba(0,0,0,0.2);
+  flex-shrink:0;
 }
 .memberCard img{
   width:80px;
@@ -117,10 +115,10 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   100% {transform: scale(1) rotate(0deg);}
 }
 
-/* 当たりメッセージとアニメーション */
+/* 当たりメッセージ 横断幕 */
 #message{
   position:fixed;
-  top:50%;
+  top:30%;
   left:50%;
   transform:translate(-50%,-50%) scale(0);
   font-size:20px;
@@ -129,11 +127,29 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   text-align:center;
   pointer-events:none;
   z-index:20;
+  padding:12px;
 }
 #message.show{
   transform:translate(-50%,-50%) scale(1);
   transition:transform 0.6s ease;
 }
+#banner{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg,#ff8c00,#ffa500,#ff8c00);
+  animation:wave 1s ease-in-out infinite alternate;
+  border-radius:12px;
+  z-index:-1;
+  filter: blur(4px);
+}
+@keyframes wave{
+  0%{transform:translateX(-5px);}
+  100%{transform:translateX(5px);}
+}
+
 #message img{
   width:100px;
   height:100px;
@@ -143,9 +159,14 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
 #messageContent{
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
+  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.3);
+  border-radius:12px;
+  padding:8px 12px;
 }
 </style>
 </head>
@@ -158,7 +179,7 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   <button id="addPrize">追加</button>
 </section>
 
-<div id="prizeTable"></div>
+<div class="scrollContainer" id="prizeTable"></div>
 
 <section>
   <label>野球チームメンバー登録（写真＋名前）</label>
@@ -167,12 +188,13 @@ button{background:#8b5e3c;color:#fff;font-weight:bold;border:none;cursor:pointer
   <button id="addMember">追加</button>
 </section>
 
-<div id="memberStage"></div>
+<div class="scrollContainer" id="memberStage"></div>
 
 <div id="gachaBox"></div>
 <button id="startGacha">ガチャを引く</button>
 
 <div id="message">
+  <div id="banner"></div>
   <div id="messageContent"></div>
 </div>
 
@@ -267,7 +289,6 @@ startGacha.addEventListener('click',()=>{
   const {ball,p}=balls[ballIdx];
   balls.splice(ballIdx,1);
 
-  // 上に移動
   const offsetY=-120;
   ball.style.transition='transform 1s ease, top 1s ease, left 1s ease';
   ball.style.top=parseFloat(ball.style.top)+offsetY+'px';
@@ -278,7 +299,6 @@ startGacha.addEventListener('click',()=>{
   },1000);
 
   setTimeout(()=>{
-    // メッセージ表示
     messageContent.innerHTML='';
     const memberImg=document.createElement('img');
     memberImg.src=member.src;
