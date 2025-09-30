@@ -79,18 +79,25 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 }
 .ball{
   position:absolute;
-  width:50px;
-  height:50px;
+  width:60px;
+  height:60px;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
+  font-size:14px;
   font-weight:bold;
   color:#fff;
   cursor:pointer;
   box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  overflow:hidden;
   transition:transform 1s ease, top 1s ease, left 1s ease;
+}
+.ball img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
 }
 .ball.spin{
   animation:spin 1.5s linear infinite;
@@ -108,26 +115,35 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
   100% {transform: scale(1) rotate(0deg);}
 }
 
-/* 当たりメッセージ */
+/* 当たりメッセージとアニメーション */
 #message{
   position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%) scale(0);
-  font-size:24px;
+  font-size:20px;
   font-weight:bold;
-  color:#f90;
-  background:rgba(255,255,255,0.9);
-  padding:16px 24px;
-  border-radius:16px;
+  color:#fff;
   text-align:center;
   pointer-events:none;
-  z-index:10;
-  transition:transform 0.5s ease, opacity 0.5s ease;
+  z-index:20;
 }
 #message.show{
   transform:translate(-50%,-50%) scale(1);
-  opacity:1;
+  transition:transform 0.6s ease;
+}
+#message img{
+  width:100px;
+  height:100px;
+  object-fit:cover;
+  border-radius:12px;
+  margin:6px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+#messageContent{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 </style>
 </head>
@@ -154,7 +170,9 @@ button{background:#f90;color:#fff;font-weight:bold;border:none;cursor:pointer;}
 <div id="gachaBox"></div>
 <button id="startGacha">ガチャを引く</button>
 
-<div id="message">🎉 当たり！🎉</div>
+<div id="message">
+  <div id="messageContent"></div>
+</div>
 
 <script>
 const prizeTable = document.getElementById('prizeTable');
@@ -162,34 +180,36 @@ const memberStage = document.getElementById('memberStage');
 const gachaBox = document.getElementById('gachaBox');
 const startGacha = document.getElementById('startGacha');
 const message = document.getElementById('message');
+const messageContent = document.getElementById('messageContent');
 
 let prizes = [];
 let members = [];
 let balls = [];
 
-// 追加処理
+// 賞品追加
 document.getElementById('addPrize').addEventListener('click',()=>{
   const file = document.getElementById('prizeImg').files[0];
   const name = document.getElementById('prizeName').value.trim();
-  if(!file || !name){ alert('写真と名前を入力'); return; }
+  if(!file||!name){ alert('写真と名前を入力'); return; }
   const reader = new FileReader();
-  reader.onload = e=>{
+  reader.onload=e=>{
     const src = e.target.result;
-    prizes.push({name, src});
+    prizes.push({name,src});
     renderPrizes();
     createGachaBalls();
   };
   reader.readAsDataURL(file);
 });
 
+// メンバー追加
 document.getElementById('addMember').addEventListener('click',()=>{
   const file = document.getElementById('memberImg').files[0];
   const name = document.getElementById('memberName').value.trim();
-  if(!file || !name){ alert('写真と名前を入力'); return; }
+  if(!file||!name){ alert('写真と名前を入力'); return; }
   const reader = new FileReader();
-  reader.onload = e=>{
+  reader.onload=e=>{
     const src = e.target.result;
-    members.push({name, src});
+    members.push({name,src});
     renderMembers();
   };
   reader.readAsDataURL(file);
@@ -216,17 +236,18 @@ function renderMembers(){
   });
 }
 
-// ガチャボール作成
+// ガチャボール作成（画像入り）
 function createGachaBalls(){
   gachaBox.innerHTML='';
   balls=[];
   prizes.forEach((p,i)=>{
     const ball=document.createElement('div');
     ball.className='ball spin';
-    ball.textContent=i+1;
-    // ランダム配置
-    const top = Math.random()*120 + 40;
-    const left = Math.random()*80 + 40;
+    const img=document.createElement('img');
+    img.src=p.src;
+    ball.appendChild(img);
+    const top=Math.random()*120+40;
+    const left=Math.random()*60+60;
     ball.style.top=top+'px';
     ball.style.left=left+'px';
     gachaBox.appendChild(ball);
@@ -236,18 +257,16 @@ function createGachaBalls(){
 
 // ガチャ実行
 startGacha.addEventListener('click',()=>{
-  if(members.length===0 || balls.length===0){ alert('メンバーと賞品を登録'); return; }
-  // ランダムメンバー
-  const memberIdx = Math.floor(Math.random()*members.length);
-  const member = members[memberIdx];
+  if(members.length===0||balls.length===0){ alert('メンバーと賞品を登録'); return; }
+  const memberIdx=Math.floor(Math.random()*members.length);
+  const member=members[memberIdx];
 
-  // ランダムボール
-  const ballIdx = Math.floor(Math.random()*balls.length);
+  const ballIdx=Math.floor(Math.random()*balls.length);
   const {ball,p}=balls[ballIdx];
   balls.splice(ballIdx,1);
 
   // 上に移動
-  const offsetY = -120;
+  const offsetY=-120;
   ball.style.transition='transform 1s ease, top 1s ease, left 1s ease';
   ball.style.top=parseFloat(ball.style.top)+offsetY+'px';
 
@@ -257,12 +276,22 @@ startGacha.addEventListener('click',()=>{
   },1000);
 
   setTimeout(()=>{
-    message.textContent=`${member.name} さんの当たりは: ${p.name} 🎉`;
+    // メッセージ表示
+    messageContent.innerHTML='';
+    const memberImg=document.createElement('img');
+    memberImg.src=member.src;
+    const prizeImg=document.createElement('img');
+    prizeImg.src=p.src;
+    const text=document.createElement('div');
+    text.textContent=`${member.name} さんの当たりは: ${p.name} 🎉`;
+    messageContent.appendChild(memberImg);
+    messageContent.appendChild(prizeImg);
+    messageContent.appendChild(text);
     message.classList.add('show');
     setTimeout(()=>message.classList.remove('show'),2500);
   },1600);
 });
-
 </script>
+
 </body>
 </html>
